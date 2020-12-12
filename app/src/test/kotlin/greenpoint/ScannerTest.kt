@@ -190,6 +190,29 @@ class ScannerTest {
         )
     }
 
+    @Test fun testScannerScanTokenMultilineComment() {
+        var scanner = Scanner("./*blah i am a comment\n-*/,")
+        var expected = mutableListOf<Token>(
+            Token(TokenType.DOT, ".", null, 1),
+            Token(TokenType.COMMA, ",", null, 2),
+        )
+        var result = scanner.scanTokens()
+        assertEquals(
+            expected,
+            result,
+        )
+
+        scanner = Scanner("./*blah i am a comment\n-,")
+        var raised = false
+        try {
+            // should fail since comment isn't terminated
+            scanner.scanTokens()
+        } catch(e: Exception) {
+            raised = true
+        }
+        assertTrue(raised)
+    }
+
     @Test fun testScannerScanTokenNewline() {
         val scanner = Scanner("\n\n.\n\n")
         assertEquals(scanner.line, 1)

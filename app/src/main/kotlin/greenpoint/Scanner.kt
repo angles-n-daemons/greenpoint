@@ -74,18 +74,7 @@ class Scanner(val source: String) {
                 token = newToken(if (match('=')) TokenType.LESS_EQUAL else TokenType.LESS)
             }
             // edge case for slash, consume comment if double slash
-            '/' -> {
-                if (match('/')) {
-                    // a comment goes until the end of the line or file
-                    while (peek() != '\n' && !isAtEnd()) {
-                        advance()
-                    }
-                } else if match('*') {
-                    
-                } else {
-                    token = newToken(TokenType.SLASH)
-                }
-            }
+            '/' -> token = scanSlash()
             // increment line counter for newlines
             '\n' -> line++
             // do nothing for whitespace
@@ -137,8 +126,8 @@ class Scanner(val source: String) {
             while (peek() != '\n' && !isAtEnd()) {
                 advance()
             }
-        } else if match('*') {
-            while (!(peek() == '*' and peekNext == '/') && !isAtEnd()) {
+        } else if (match('*')) {
+            while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) {
                 if (peek() == '\n') {
                     line++
                 }
@@ -148,11 +137,13 @@ class Scanner(val source: String) {
             if (isAtEnd()) {
                 throw(ScannerError(line, "", "Unterminated multiline comment $lineBeginning"))
             }
+
             advance()
             advance()
         } else {
             return newToken(TokenType.SLASH)
         }
+        return null
     }
 
     fun scanString(): Token {
