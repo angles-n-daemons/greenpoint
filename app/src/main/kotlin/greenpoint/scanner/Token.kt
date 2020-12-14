@@ -1,4 +1,4 @@
-package greenpoint
+package greenpoint.scanner
 
 enum class TokenType {
     // Single character tokens

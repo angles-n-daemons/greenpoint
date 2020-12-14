@@ -1,5 +1,7 @@
 package greenpoint
 
+import greenpoint.scanner.Scanner
+
 class Interpreter {
 	fun run(source: String): Any {
         val scanner = Scanner(source)

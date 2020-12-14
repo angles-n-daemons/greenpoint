@@ -1,4 +1,4 @@
-package greenpoint
+package greenpoint.scanner
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

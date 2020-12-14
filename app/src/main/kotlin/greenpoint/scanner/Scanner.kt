@@ -1,4 +1,4 @@
-package greenpoint
+package greenpoint.scanner
 
 val KEYWORDS = mutableMapOf<String, TokenType>(
     "and" to TokenType.AND,
