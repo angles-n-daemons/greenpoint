@@ -23,8 +23,21 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun expression(): Expression {
-        return equality()
+        return block()
     }
+
+    private fun block(): Expression {
+        var expr = equality()
+
+        while (match(TokenType.COMMA)) {
+            val op = previous()
+            val right = equality()
+            expr = Binary(expr, op, right)
+        }
+
+        return expr
+    }
+
 
     private fun equality(): Expression {
         var expr = comparison()

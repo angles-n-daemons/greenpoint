@@ -9,7 +9,7 @@ import greenpoint.grammar.ASTPrinter
 
 class ParserTest {
     @Test fun testSimple() {
-        val scanner = Scanner("!(5 + 8 * (3 / 1) == 4)")
+        val scanner = Scanner("!(5 + 8 * (3 / 1) == 4), 5 + 9")
         val parser = Parser(scanner.scanTokens())
         val printer = ASTPrinter()
         val expr = parser.parse()
@@ -17,7 +17,7 @@ class ParserTest {
             throw Exception("parser failed")
         }
         assertEquals(
-            "(! (group (== (+ 5.0 (* 8.0 (group (/ 3.0 1.0)))) 4.0)))",
+            "(, (! (group (== (+ 5.0 (* 8.0 (group (/ 3.0 1.0)))) 4.0))) (+ 5.0 9.0))",
             printer.print(expr),
         )
     }
