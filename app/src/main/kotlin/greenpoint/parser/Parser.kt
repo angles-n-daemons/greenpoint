@@ -7,6 +7,8 @@ import greenpoint.grammar.Binary
 import greenpoint.grammar.Unary
 import greenpoint.grammar.Group
 import greenpoint.grammar.Literal
+import greenpoint.grammar.ExpressionList
+import greenpoint.grammar.Ternary
 
 class ParseError(message: String): RuntimeException(message)
 
@@ -23,21 +25,31 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun expression(): Expression {
-        return block()
+        return comma()
     }
 
-    private fun block(): Expression {
-        var expr = equality()
+    private fun comma(): Expression {
+        var expressions = mutableListOf<Expression>(ternary())
 
         while (match(TokenType.COMMA)) {
-            val op = previous()
+            expressions.add(ternary())
+        }
+
+        return if (expressions.size == 1) expressions.first() else ExpressionList(expressions)
+    }
+
+    private fun ternary(): Expression {
+        var expr = equality()
+
+        if (match(TokenType.QUESTION)) {
+            val left = equality()
+            consume(TokenType.COLON, "Missing colon in ternary expression")
             val right = equality()
-            expr = Binary(expr, op, right)
+            expr = Ternary(expr, left, right)
         }
 
         return expr
     }
-
 
     private fun equality(): Expression {
         var expr = comparison()

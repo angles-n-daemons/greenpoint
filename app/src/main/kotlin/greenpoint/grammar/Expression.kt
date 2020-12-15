@@ -31,6 +31,22 @@ class Group(val expr: Expression): Expression() {
     }
 }
 
+class ExpressionList(val expressions: List<Expression>): Expression() {
+    override fun <R> accept(visitor: Visitor<R>): R {
+        return visitor.visitExpressionList(this)
+    }
+}
+
+class Ternary(
+    val condition: Expression,
+    val left: Expression,
+    val right: Expression,
+): Expression() {
+    override fun <R> accept(visitor: Visitor<R>): R {
+        return visitor.visitTernary(this)
+    }
+}
+
 class Literal(val value: Any?): Expression() {
     override fun <R> accept(visitor: Visitor<R>): R {
         return visitor.visitLiteral(this)

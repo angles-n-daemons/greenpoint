@@ -5,6 +5,8 @@ interface Visitor<R> {
     fun visitUnary(unary: Unary): R
     fun visitLiteral(literal: Literal): R
     fun visitGroup(group: Group): R
+    fun visitExpressionList(expressions: ExpressionList): R
+    fun visitTernary(ternary: Ternary): R
 }
 
 class ASTPrinter: Visitor<String> {
@@ -35,6 +37,14 @@ class ASTPrinter: Visitor<String> {
         return literal.value?.toString() ?: "nil"
     }
 
+    override fun visitExpressionList(expressionList: ExpressionList): String {
+        return parenthesize("list", *expressionList.expressions.toTypedArray())
+    }
+
+    override fun visitTernary(ternary: Ternary): String {
+        return parenthesize("ternary", ternary.condition, ternary.left, ternary.right)
+    }
+
     private fun parenthesize(name: String, vararg exprs: Expression): String {
         val builder = StringBuilder();
         builder.append("(")
@@ -45,51 +55,6 @@ class ASTPrinter: Visitor<String> {
             builder.append(expr.accept(this))
         }
         builder.append(")")
-        
-        return builder.toString()
-    }
-}
-
-class RPNPrinter: Visitor<String> {
-    fun print(expr: Expression): String {
-        return expr.accept(this)
-    }
-
-    override fun visitBinary(binary: Binary): String {
-        return push(
-            binary.op.lexeme,
-            binary.left,
-            binary.right,
-        )
-    }
-
-    override fun visitUnary(unary: Unary): String {
-        return push(
-            unary.op.lexeme,
-            unary.expr,
-        )
-    }
-
-    override fun visitGroup(group: Group): String {
-        return push("", group.expr)
-    }
-
-    override fun visitLiteral(literal: Literal): String {
-        return literal.value?.toString() ?: "nil"
-    }
-
-    private fun push(name: String, vararg exprs: Expression): String {
-        val builder = StringBuilder();
-
-        for (expr in exprs) {
-            builder.append(" ")
-            builder.append(expr.accept(this))
-        }
-
-        if (name != "") {
-            builder.append(" ")
-            builder.append(name)
-        }
         
         return builder.toString()
     }

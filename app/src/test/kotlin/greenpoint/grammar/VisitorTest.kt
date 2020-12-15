@@ -23,26 +23,4 @@ class VisitorTest {
             printer.print(expression),
         )
     }
-
-    @Test fun testRPNVisitor() {
-        val expression = Binary(
-            Group(Binary(
-                Literal(1),
-                Token(TokenType.PLUS, "+", null, 0),
-                Literal(2),
-            )),
-            Token(TokenType.STAR, "*", null, 0),
-            Group(Binary(
-                Literal(4),
-                Token(TokenType.MINUS, "-", null, 0),
-                Literal(3),
-            )),
-        )
-            
-        val printer = RPNPrinter()
-        assertEquals(
-            "   1 2 +   4 3 - *",
-            printer.print(expression),
-        )
-    }
 }

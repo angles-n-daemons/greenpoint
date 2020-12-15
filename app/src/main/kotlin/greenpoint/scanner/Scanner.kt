@@ -60,6 +60,8 @@ class Scanner(val source: String) {
             '-' -> token = newToken(TokenType.MINUS)
             ';' -> token = newToken(TokenType.SEMICOLON)
             '*' -> token = newToken(TokenType.STAR)
+            '?' -> token = newToken(TokenType.QUESTION)
+            ':' -> token = newToken(TokenType.COLON)
             // single/double character tokens
             '!' -> {
                 token = newToken(if (match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
