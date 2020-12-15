@@ -41,8 +41,8 @@ class InterpreterTest {
             ITest("3 - 4", -1.0),
             ITest("5 + 6", 11.0),
             // cannot add different types
-            ITest("5 + \"john\"", null, true),
-            ITest("nil + \"john\"", null, true),
+            ITest("5 + \"john\"", "5.0john"),
+            ITest("nil + \"john\"", "niljohn"),
 
             // comparators
             ITest("6 > 3", true),

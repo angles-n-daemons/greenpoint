@@ -88,8 +88,21 @@ class Interpreter: Visitor<Any?> {
     private fun plus(a: Any?, b: Any?): Any? {
         if (a is Double && b is Double) {
             return a + b
-        } else if (a is String && b is String) {
-            return a + b
+        } else if (a is String || b is String) {
+            var aStr = when(a) {
+                is String -> a
+                is Boolean, is Double -> a.toString()
+                null -> "nil"
+                else -> throw RuntimeException("Cannot convert $a to string for concatenation")
+            }
+            var bStr = when(b) {
+                is String -> b
+                is Boolean, is Double -> b.toString()
+                null -> "nil"
+                else -> throw RuntimeException("Cannot convert $b to string for concatenation")
+            }
+            
+            return aStr + bStr
         }
 
         throw RuntimeError("Cannot add $a.javaClass.kotlin.qualifiedName and $b.javaClass.kotlin.qualifiedName")
