@@ -17,11 +17,11 @@ class Parser(val tokens: List<Token>){
     val errors = mutableListOf<ParseError>()
 
     fun parse(): Expression? {
-        try {
-            return expression()
-        } catch(error: ParseError) {
-            return null
+        val expr =  expression()
+        if (current < tokens.size) {
+            throw ParseError("Parse did not read all tokens")
         }
+        return expr
     }
 
     private fun expression(): Expression {

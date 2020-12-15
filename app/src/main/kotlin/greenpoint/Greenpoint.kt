@@ -7,6 +7,8 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
+import greenpoint.interpreter.Interpreter
+
 class Greenpoint {
     var hadError: Boolean = false
     val interpreter = Interpreter()

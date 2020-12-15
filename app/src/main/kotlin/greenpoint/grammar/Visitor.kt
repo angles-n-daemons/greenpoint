@@ -5,7 +5,7 @@ interface Visitor<R> {
     fun visitUnary(unary: Unary): R
     fun visitLiteral(literal: Literal): R
     fun visitGroup(group: Group): R
-    fun visitExpressionList(expressions: ExpressionList): R
+    fun visitExpressionList(expressionList: ExpressionList): R
     fun visitTernary(ternary: Ternary): R
 }
 
