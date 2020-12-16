@@ -155,6 +155,7 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun consume(type: TokenType, message: String): Token {
+        if(isAtEnd()) throw ParseError("Reached EOF while searching for $type")
         if(check(type)) return advance()
         throw ParseError("$message - ${peek().type}")
     }

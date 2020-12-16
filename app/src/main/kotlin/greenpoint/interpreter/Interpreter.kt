@@ -17,8 +17,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         val parser = Parser(tokens)
         val statements = parser.parse()
         for (statement in statements) {
-            println(statement)
-            //evaluate(stmt)
+            execute(statement)
         }
         return null
 	}
@@ -30,12 +29,18 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         return evaluate(parser.parseExpression())
     }
 
+    private fun execute(stmt: Stmt): Any? {
+        return stmt.accept(this)
+    }
+
     override fun visitExpressionStmt(stmt: Stmt.Expression): Any? {
         return evaluate(stmt.expr)
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print): Any? {
-        return evaluate(stmt.expr)
+        val expr = evaluate(stmt.expr)
+        println(expr)
+        return expr
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
