@@ -29,6 +29,13 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         return evaluate(parser.parseExpression())
     }
 
+    fun runStatement(source: String): Any? {
+        val scanner = Scanner(source)
+        val tokens = scanner.scanTokens()
+        val parser = Parser(tokens)
+        return execute(parser.parseStatement())
+    }
+
     private fun execute(stmt: Stmt): Any? {
         return stmt.accept(this)
     }
@@ -38,9 +45,18 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print): Any? {
-        val expr = evaluate(stmt.expr)
-        println(expr)
-        return expr
+        val value = evaluate(stmt.expr)
+        println(value)
+        return value
+    }
+
+    override fun visitVarStmt(stmt: Stmt.Var): Any? {
+        var value: Any? = null
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer)
+        }
+        println(value)
+        return null
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
@@ -86,6 +102,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         }
         return values
     }
+
     override fun visitTernaryExpr(expr: Expr.Ternary): Any? {
         val condition = evaluate(expr.condition)
 
@@ -94,6 +111,10 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         } else {
             return evaluate(expr.right)
         }
+    }
+    
+    override fun visitVariableExpr(expr: Expr.Variable): Any? {
+        throw Exception("fatal: interpreter visitvarexpr not implemented")
     }
 
     private fun evaluate(expr: Expr): Any? {

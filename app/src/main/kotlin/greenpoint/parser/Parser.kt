@@ -9,22 +9,32 @@ class ParseError(message: String): RuntimeException(message)
 
 class Parser(val tokens: List<Token>){
     var current = 0
-    val errors = mutableListOf<ParseError>()
+    val errors = mutableListOf<Exception>()
 
     fun parse(): List<Stmt> {
         val statements = mutableListOf<Stmt>()
         while(!isAtEnd()) {
-            statements.add(statement())
+            try {
+                statements.add(declaration())
+            } catch (e: Exception) {
+                errors.add(e)
+                synchronize()
+            }
         }
         return statements
     }
 
     fun parseExpression(): Expr {
-        val expr = expression()
-        if (current < tokens.size) {
-            throw ParseError("Finished parsing before reaching end of input")
-        }
-        return expr
+        return expression()
+    }
+
+    fun parseStatement(): Stmt {
+        return declaration()
+    }
+
+    private fun declaration(): Stmt {
+        if (match(TokenType.VAR)) return varDeclaration()
+        return statement()
     }
 
     private fun statement(): Stmt {
@@ -40,8 +50,20 @@ class Parser(val tokens: List<Token>){
 
     private fun expressionStmt(): Stmt {
         val expr = expression()
-        consume(TokenType.SEMICOLON, "Expecting ';' after expression")
+        consume(TokenType.SEMICOLON, "Expecting ';' after print statement")
         return Stmt.Expression(expr)
+    }
+
+    private fun varDeclaration(): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expect variable name")
+
+        var initializer: Expr? = null
+        if (match(TokenType.EQUAL)) {
+            initializer = expression()
+        }
+
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        return Stmt.Var(name, initializer)
     }
 
     private fun expression(): Expr {
@@ -137,6 +159,7 @@ class Parser(val tokens: List<Token>){
         if (match(TokenType.FALSE)) return Expr.Literal(false)
         if (match(TokenType.TRUE)) return Expr.Literal(true)
         if (match(TokenType.NIL)) return Expr.Literal(null)
+        if (match(TokenType.IDENTIFIER)) return Expr.Variable(previous())
 
         if (match(TokenType.NUMBER, TokenType.STRING)) {
             return Expr.Literal(previous().literal)
@@ -194,7 +217,7 @@ class Parser(val tokens: List<Token>){
         return tokens.get(current-1)
     }
 
-    private fun syncrhonize() {
+    private fun synchronize() {
         advance()
         while (!isAtEnd()) {
             if (previous().type == TokenType.SEMICOLON) return

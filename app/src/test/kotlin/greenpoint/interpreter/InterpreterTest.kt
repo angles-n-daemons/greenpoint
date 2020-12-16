@@ -82,4 +82,38 @@ class InterpreterTest {
             assertEquals(test.expected, result)
         }
     }
+
+    @Test fun testInterpreterStmt() {
+        val tests = listOf<ITest>(
+            // variable examples
+            ITest("var tree = 8;", null),
+            // no semi colon
+            ITest("var tree = 8", null, true),
+            
+            // print examples
+            ITest("print 5 + 6;", 11.0),
+            ITest("print 4 / 6;", 4.0/6.0),
+            // no semi colon
+            ITest("print 4 / 6", null, true),
+
+            // expression examples
+            ITest("5 * 3;", 15.0),
+            ITest("5 * 3", null, true),
+        )
+        val interpreter = Interpreter()
+
+        for (test in tests) {
+            var result: Any? = null
+            var raisedError = false
+
+            try {
+                result = interpreter.runStatement(test.input)
+            } catch(e: Exception) {
+                raisedError = true
+            }
+
+            assertEquals(test.raisesError, raisedError)
+            assertEquals(test.expected, result)
+        }
+    }
 }

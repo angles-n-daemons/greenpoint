@@ -12,6 +12,7 @@ sealed class Expr {
         fun visitGroupExpr(expr: Group): R
         fun visitExprListExpr(expr: ExprList): R
         fun visitTernaryExpr(expr: Ternary): R
+        fun visitVariableExpr(expr: Variable): R
     }
 
     class Binary( 
@@ -58,6 +59,12 @@ sealed class Expr {
     class Literal(val value: Any?): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitLiteralExpr(this)
+        }
+    }
+
+    class Variable(val name: Token): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitVariableExpr(this)
         }
     }
 }
