@@ -5,18 +5,11 @@ import greenpoint.scanner.TokenType
 
 import greenpoint.parser.Parser
 
-import greenpoint.grammar.Visitor
 import greenpoint.grammar.Expression
-import greenpoint.grammar.Binary
-import greenpoint.grammar.Unary
-import greenpoint.grammar.Group
-import greenpoint.grammar.Literal
-import greenpoint.grammar.ExpressionList
-import greenpoint.grammar.Ternary
 
 class RuntimeError(message: String): RuntimeException(message)
 
-class Interpreter: Visitor<Any?> {
+class Interpreter: Expression.Visitor<Any?> {
 	fun run(source: String): Any? {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
@@ -28,7 +21,7 @@ class Interpreter: Visitor<Any?> {
         return evaluate(expr)
 	}
 
-    override fun visitBinary(binary: Binary): Any? {
+    override fun visitBinary(binary: Expression.Binary): Any? {
         val left = evaluate(binary.left)
         val right = evaluate(binary.right)
         when(binary.op.type) {
@@ -46,7 +39,7 @@ class Interpreter: Visitor<Any?> {
         }
     }
 
-    override fun visitUnary(unary: Unary): Any? {
+    override fun visitUnary(unary: Expression.Unary): Any? {
         val right = evaluate(unary.expr)
 
         when(unary.op.type) {
@@ -56,22 +49,22 @@ class Interpreter: Visitor<Any?> {
         }
     }
 
-    override fun visitLiteral(literal: Literal): Any? {
+    override fun visitLiteral(literal: Expression.Literal): Any? {
         return literal.value
     }
 
-    override fun visitGroup(group: Group): Any? {
+    override fun visitGroup(group: Expression.Group): Any? {
         return evaluate(group.expr)
     }
 
-    override fun visitExpressionList(expressionList: ExpressionList): Any? {
+    override fun visitExpressionList(expressionList: Expression.ExpressionList): Any? {
         val values = mutableListOf<Any?>()
         for (expression in expressionList.expressions) {
             values.add(evaluate(expression))
         }
         return values
     }
-    override fun visitTernary(ternary: Ternary): Any? {
+    override fun visitTernary(ternary: Expression.Ternary): Any? {
         val condition = evaluate(ternary.condition)
 
         if (isTruthy(condition)) {

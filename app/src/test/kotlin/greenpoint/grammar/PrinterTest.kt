@@ -8,13 +8,13 @@ import greenpoint.scanner.TokenType
 
 class VisitorTest {
     @Test fun testASTVisitor() {
-        val expression = Binary(
-            Unary(
+        val expression = Expression.Binary(
+            Expression.Unary(
                 Token(TokenType.MINUS, "-", null, 1),
-                Literal(123),
+                Expression.Literal(123),
             ),
             Token(TokenType.STAR, "*", null, 1),
-            Group(Literal(45.67)),
+            Expression.Group(Expression.Literal(45.67)),
         )
             
         val printer = ASTPrinter()

@@ -3,12 +3,6 @@ package greenpoint.parser
 import greenpoint.scanner.Token
 import greenpoint.scanner.TokenType
 import greenpoint.grammar.Expression
-import greenpoint.grammar.Binary
-import greenpoint.grammar.Unary
-import greenpoint.grammar.Group
-import greenpoint.grammar.Literal
-import greenpoint.grammar.ExpressionList
-import greenpoint.grammar.Ternary
 
 class ParseError(message: String): RuntimeException(message)
 
@@ -35,7 +29,7 @@ class Parser(val tokens: List<Token>){
             expressions.add(ternary())
         }
 
-        return if (expressions.size == 1) expressions.first() else ExpressionList(expressions)
+        return if (expressions.size == 1) expressions.first() else Expression.ExpressionList(expressions)
     }
 
     private fun ternary(): Expression {
@@ -45,7 +39,7 @@ class Parser(val tokens: List<Token>){
             val left = equality()
             consume(TokenType.COLON, "Missing colon in ternary expression")
             val right = equality()
-            expr = Ternary(expr, left, right)
+            expr = Expression.Ternary(expr, left, right)
         }
 
         return expr
@@ -56,7 +50,7 @@ class Parser(val tokens: List<Token>){
         while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
             val op = previous()
             val right = comparison()
-            expr = Binary(expr, op, right)
+            expr = Expression.Binary(expr, op, right)
         }
 
         return expr
@@ -73,7 +67,7 @@ class Parser(val tokens: List<Token>){
         )) {
             val op = previous()
             val right = term()
-            expr = Binary(expr, op, right)
+            expr = Expression.Binary(expr, op, right)
         }
 
         return expr
@@ -85,7 +79,7 @@ class Parser(val tokens: List<Token>){
         while (match(TokenType.PLUS, TokenType.MINUS)) {
             val op = previous()
             val right = factor()
-            expr = Binary(expr, op, right)
+            expr = Expression.Binary(expr, op, right)
         }
 
         return expr
@@ -97,7 +91,7 @@ class Parser(val tokens: List<Token>){
         while (match(TokenType.SLASH, TokenType.STAR)) {
             val op = previous()
             val right = unary()
-            expr = Binary(expr, op, right)
+            expr = Expression.Binary(expr, op, right)
         }
 
         return expr
@@ -107,25 +101,25 @@ class Parser(val tokens: List<Token>){
         if (match(TokenType.BANG, TokenType.MINUS)) {
             val op = previous()
             val right = primary()
-            return Unary(op, right)
+            return Expression.Unary(op, right)
         }
 
         return primary()
     }
 
     private fun primary(): Expression {
-        if (match(TokenType.FALSE)) return Literal(false)
-        if (match(TokenType.TRUE)) return Literal(true)
-        if (match(TokenType.NIL)) return Literal(null)
+        if (match(TokenType.FALSE)) return Expression.Literal(false)
+        if (match(TokenType.TRUE)) return Expression.Literal(true)
+        if (match(TokenType.NIL)) return Expression.Literal(null)
 
         if (match(TokenType.NUMBER, TokenType.STRING)) {
-            return Literal(previous().literal)
+            return Expression.Literal(previous().literal)
         }
 
         if (match(TokenType.LEFT_PAREN)) {
             val expr = expression()
             consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return Group(expr)
+            return Expression.Group(expr)
         }
 
         if (isAtEnd()) {

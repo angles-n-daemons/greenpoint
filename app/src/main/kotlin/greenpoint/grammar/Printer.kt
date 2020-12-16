@@ -1,20 +1,11 @@
 package greenpoint.grammar
 
-interface Visitor<R> {
-    fun visitBinary(binary: Binary): R
-    fun visitUnary(unary: Unary): R
-    fun visitLiteral(literal: Literal): R
-    fun visitGroup(group: Group): R
-    fun visitExpressionList(expressionList: ExpressionList): R
-    fun visitTernary(ternary: Ternary): R
-}
-
-class ASTPrinter: Visitor<String> {
+class ASTPrinter: Expression.Visitor<String> {
     fun print(expr: Expression): String {
         return expr.accept(this)
     }
 
-    override fun visitBinary(binary: Binary): String {
+    override fun visitBinary(binary: Expression.Binary): String {
         return parenthesize(
             binary.op.lexeme,
             binary.left,
@@ -22,26 +13,26 @@ class ASTPrinter: Visitor<String> {
         )
     }
 
-    override fun visitUnary(unary: Unary): String {
+    override fun visitUnary(unary: Expression.Unary): String {
         return parenthesize(
             unary.op.lexeme,
             unary.expr,
         )
     }
 
-    override fun visitGroup(group: Group): String {
+    override fun visitGroup(group: Expression.Group): String {
         return parenthesize("group", group.expr)
     }
 
-    override fun visitLiteral(literal: Literal): String {
+    override fun visitLiteral(literal: Expression.Literal): String {
         return literal.value?.toString() ?: "nil"
     }
 
-    override fun visitExpressionList(expressionList: ExpressionList): String {
+    override fun visitExpressionList(expressionList: Expression.ExpressionList): String {
         return parenthesize("list", *expressionList.expressions.toTypedArray())
     }
 
-    override fun visitTernary(ternary: Ternary): String {
+    override fun visitTernary(ternary: Expression.Ternary): String {
         return parenthesize("ternary", ternary.condition, ternary.left, ternary.right)
     }
 
