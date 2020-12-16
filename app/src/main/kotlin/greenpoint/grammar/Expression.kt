@@ -2,62 +2,62 @@ package greenpoint.grammar
 
 import greenpoint.scanner.Token
 
-sealed class Expression {
+sealed class Expr {
     abstract fun <R> accept(visitor: Visitor<R>): R
 
     interface Visitor<R> {
-        fun visitBinary(binary: Binary): R
-        fun visitUnary(unary: Unary): R
-        fun visitLiteral(literal: Literal): R
-        fun visitGroup(group: Group): R
-        fun visitExpressionList(expressionList: ExpressionList): R
-        fun visitTernary(ternary: Ternary): R
+        fun visitBinaryExpr(expr: Binary): R
+        fun visitUnaryExpr(expr: Unary): R
+        fun visitLiteralExpr(expr: Literal): R
+        fun visitGroupExpr(expr: Group): R
+        fun visitExprListExpr(expr: ExprList): R
+        fun visitTernaryExpr(expr: Ternary): R
     }
 
     class Binary( 
-        val left: Expression,
+        val left: Expr,
         val op: Token,
-        val right: Expression,
-    ): Expression() {
+        val right: Expr,
+    ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitBinary(this)
+            return visitor.visitBinaryExpr(this)
         }
     }
 
     class Unary(
         val op: Token,
-        val expr: Expression,
-    ): Expression() {
+        val expr: Expr,
+    ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitUnary(this)
+            return visitor.visitUnaryExpr(this)
         }
     }
 
-    class Group(val expr: Expression): Expression() {
+    class Group(val expr: Expr): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitGroup(this)
+            return visitor.visitGroupExpr(this)
         }
     }
 
-    class ExpressionList(val expressions: List<Expression>): Expression() {
+    class ExprList(val expressions: List<Expr>): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitExpressionList(this)
+            return visitor.visitExprListExpr(this)
         }
     }
 
     class Ternary(
-        val condition: Expression,
-        val left: Expression,
-        val right: Expression,
-    ): Expression() {
+        val condition: Expr,
+        val left: Expr,
+        val right: Expr,
+    ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitTernary(this)
+            return visitor.visitTernaryExpr(this)
         }
     }
 
-    class Literal(val value: Any?): Expression() {
+    class Literal(val value: Any?): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitLiteral(this)
+            return visitor.visitLiteralExpr(this)
         }
     }
 }

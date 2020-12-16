@@ -73,7 +73,7 @@ class InterpreterTest {
             var raisedError = false
 
             try {
-                result = interpreter.run(test.input)
+                result = interpreter.runExpression(test.input)
             } catch(e: Exception) {
                 raisedError = true
             }

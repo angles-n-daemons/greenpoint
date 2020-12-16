@@ -1,42 +1,50 @@
 package greenpoint.grammar
 
-class ASTPrinter: Expression.Visitor<String> {
-    fun print(expr: Expression): String {
-        return expr.accept(this)
+class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
+    fun print(stmt: Stmt): String {
+        return stmt.accept(this)
     }
 
-    override fun visitBinary(binary: Expression.Binary): String {
+    override fun visitPrintStmt(stmt: Stmt.Print): String {
+        return stmt.expr.accept(this)
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression): String {
+        return stmt.expr.accept(this)
+    }
+
+    override fun visitBinaryExpr(expr: Expr.Binary): String {
         return parenthesize(
-            binary.op.lexeme,
-            binary.left,
-            binary.right,
+            expr.op.lexeme,
+            expr.left,
+            expr.right,
         )
     }
 
-    override fun visitUnary(unary: Expression.Unary): String {
+    override fun visitUnaryExpr(expr: Expr.Unary): String {
         return parenthesize(
-            unary.op.lexeme,
-            unary.expr,
+            expr.op.lexeme,
+            expr.expr,
         )
     }
 
-    override fun visitGroup(group: Expression.Group): String {
-        return parenthesize("group", group.expr)
+    override fun visitGroupExpr(expr: Expr.Group): String {
+        return parenthesize("group", expr.expr)
     }
 
-    override fun visitLiteral(literal: Expression.Literal): String {
-        return literal.value?.toString() ?: "nil"
+    override fun visitLiteralExpr(expr: Expr.Literal): String {
+        return expr.value?.toString() ?: "nil"
     }
 
-    override fun visitExpressionList(expressionList: Expression.ExpressionList): String {
-        return parenthesize("list", *expressionList.expressions.toTypedArray())
+    override fun visitExprListExpr(expr: Expr.ExprList): String {
+        return parenthesize("list", *expr.expressions.toTypedArray())
     }
 
-    override fun visitTernary(ternary: Expression.Ternary): String {
-        return parenthesize("ternary", ternary.condition, ternary.left, ternary.right)
+    override fun visitTernaryExpr(expr: Expr.Ternary): String {
+        return parenthesize("ternary", expr.condition, expr.left, expr.right)
     }
 
-    private fun parenthesize(name: String, vararg exprs: Expression): String {
+    private fun parenthesize(name: String, vararg exprs: Expr): String {
         val builder = StringBuilder();
         builder.append("(")
         builder.append(name)

@@ -5,26 +5,43 @@ import greenpoint.scanner.TokenType
 
 import greenpoint.parser.Parser
 
-import greenpoint.grammar.Expression
+import greenpoint.grammar.Expr
+import greenpoint.grammar.Stmt
 
 class RuntimeError(message: String): RuntimeException(message)
 
-class Interpreter: Expression.Visitor<Any?> {
+class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 	fun run(source: String): Any? {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
         val parser = Parser(tokens)
-        val expr = parser.parse()
-        if (expr == null) {
-            return expr
+        val statements = parser.parse()
+        for (statement in statements) {
+            println(statement)
+            //evaluate(stmt)
         }
-        return evaluate(expr)
+        return null
 	}
 
-    override fun visitBinary(binary: Expression.Binary): Any? {
-        val left = evaluate(binary.left)
-        val right = evaluate(binary.right)
-        when(binary.op.type) {
+    fun runExpression(source: String): Any? {
+        val scanner = Scanner(source)
+        val tokens = scanner.scanTokens()
+        val parser = Parser(tokens)
+        return evaluate(parser.parseExpression())
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression): Any? {
+        return evaluate(stmt.expr)
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print): Any? {
+        return evaluate(stmt.expr)
+    }
+
+    override fun visitBinaryExpr(expr: Expr.Binary): Any? {
+        val left = evaluate(expr.left)
+        val right = evaluate(expr.right)
+        when(expr.op.type) {
             TokenType.MINUS -> return toNumber(left) - toNumber(right)
             TokenType.SLASH -> return toNumber(left) / toNumber(right)
             TokenType.STAR -> return toNumber(left) * toNumber(right)
@@ -35,46 +52,46 @@ class Interpreter: Expression.Visitor<Any?> {
             TokenType.LESS_EQUAL -> return toNumber(left) <= toNumber(right)
             TokenType.BANG_EQUAL -> return !isEqual(left, right)
             TokenType.EQUAL_EQUAL -> return isEqual(left, right)
-            else -> throw RuntimeError("Unknown operator or comparator $binary.op.type")
+            else -> throw RuntimeError("Unknown operator or comparator $expr.op.type")
         }
     }
 
-    override fun visitUnary(unary: Expression.Unary): Any? {
-        val right = evaluate(unary.expr)
+    override fun visitUnaryExpr(expr: Expr.Unary): Any? {
+        val right = evaluate(expr.expr)
 
-        when(unary.op.type) {
+        when(expr.op.type) {
             TokenType.MINUS -> return -toNumber(right)
             TokenType.BANG -> return !isTruthy(right)
-            else -> throw RuntimeError("Unknown prefix operator $unary.op.type")
+            else -> throw RuntimeError("Unknown prefix operator $expr.op.type")
         }
     }
 
-    override fun visitLiteral(literal: Expression.Literal): Any? {
-        return literal.value
+    override fun visitLiteralExpr(expr: Expr.Literal): Any? {
+        return expr.value
     }
 
-    override fun visitGroup(group: Expression.Group): Any? {
-        return evaluate(group.expr)
+    override fun visitGroupExpr(expr: Expr.Group): Any? {
+        return evaluate(expr.expr)
     }
 
-    override fun visitExpressionList(expressionList: Expression.ExpressionList): Any? {
+    override fun visitExprListExpr(expr: Expr.ExprList): Any? {
         val values = mutableListOf<Any?>()
-        for (expression in expressionList.expressions) {
+        for (expression in expr.expressions) {
             values.add(evaluate(expression))
         }
         return values
     }
-    override fun visitTernary(ternary: Expression.Ternary): Any? {
-        val condition = evaluate(ternary.condition)
+    override fun visitTernaryExpr(expr: Expr.Ternary): Any? {
+        val condition = evaluate(expr.condition)
 
         if (isTruthy(condition)) {
-            return evaluate(ternary.left)
+            return evaluate(expr.left)
         } else {
-            return evaluate(ternary.right)
+            return evaluate(expr.right)
         }
     }
 
-    private fun evaluate(expr: Expression): Any? {
+    private fun evaluate(expr: Expr): Any? {
         return expr.accept(this)
     }
 
