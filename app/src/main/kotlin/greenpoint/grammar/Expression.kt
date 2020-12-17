@@ -13,6 +13,7 @@ sealed class Expr {
         fun visitExprListExpr(expr: ExprList): R
         fun visitTernaryExpr(expr: Ternary): R
         fun visitVariableExpr(expr: Variable): R
+        fun visitAssignExpr(expr: Assign): R
     }
 
     class Binary( 
@@ -67,4 +68,14 @@ sealed class Expr {
             return visitor.visitVariableExpr(this)
         }
     }
+
+    class Assign(
+        val name: Token,
+        val value: Expr,
+    ): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitAssignExpr(this)
+        }
+    }
+
 }

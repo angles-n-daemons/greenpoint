@@ -81,13 +81,30 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun comma(): Expr {
-        var expressions = mutableListOf<Expr>(ternary())
+        var expressions = mutableListOf<Expr>(assignment())
 
         while (match(TokenType.COMMA)) {
-            expressions.add(ternary())
+            expressions.add(assignment())
         }
 
         return if (expressions.size == 1) expressions.first() else Expr.ExprList(expressions)
+    }
+
+    private fun assignment(): Expr {
+        val expr = ternary()
+
+        if (match(TokenType.EQUAL)) {
+            val equals = previous()
+            val value = assignment()
+            if (expr is Expr.Variable) {
+                val name = expr.name
+                return Expr.Assign(name, value)
+            }
+
+            throw ParseError("Invalid assignment target ${expr.javaClass.kotlin.qualifiedName}")
+        }
+
+        return expr
     }
 
     private fun ternary(): Expr {

@@ -28,10 +28,7 @@ class Greenpoint {
                 break
             }
             try {
-                val value = interpreter.run(line)
-                if (value != null) {
-                    println(value)
-                }
+                interpreter.run(line)
             } catch (e: Exception) {
                 println(e.toString())
             }

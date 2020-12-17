@@ -59,6 +59,10 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
         return expr.name.lexeme
     }
 
+    override fun visitAssignExpr(expr: Expr.Assign): String {
+        return "${expr.name.lexeme} = ${expr.value.accept(this)}"
+    }
+
     private fun parenthesize(name: String, vararg exprs: Expr): String {
         val builder = StringBuilder();
         builder.append("(")

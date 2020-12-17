@@ -35,5 +35,4 @@ sealed class Stmt {
             return visitor.visitVarStmt(this)
         }
     }
-
 }

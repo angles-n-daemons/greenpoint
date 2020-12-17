@@ -203,13 +203,7 @@ class ScannerTest {
         )
 
         scanner = Scanner("./*blah i am a comment\n-,")
-        var raised = false
-        try {
-            // should fail since comment isn't terminated
-            scanner.scanTokens()
-        } catch(e: Exception) {
-            raised = true
-        }
+        scanner.scanTokens()
         assertTrue(scanner.hasErrors())
     }
 

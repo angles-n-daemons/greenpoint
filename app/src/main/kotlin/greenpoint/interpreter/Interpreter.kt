@@ -11,6 +11,8 @@ import greenpoint.grammar.Stmt
 class RuntimeError(message: String): RuntimeException(message)
 
 class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
+    private val environment = Environment()
+
 	fun run(source: String): Any? {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
@@ -56,7 +58,7 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print): Any? {
-        println(evaluate(stmt.expr))
+        println(stringify(evaluate(stmt.expr)))
         return null
     }
 
@@ -65,7 +67,8 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         if (stmt.initializer != null) {
             value = evaluate(stmt.initializer)
         }
-        println(value)
+
+        environment.define(stmt.name, value)
         return null
     }
 
@@ -124,7 +127,13 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
     
     override fun visitVariableExpr(expr: Expr.Variable): Any? {
-        throw Exception("fatal: interpreter visitvarexpr not implemented")
+        return environment.get(expr.name)
+    }
+    
+    override fun visitAssignExpr(expr: Expr.Assign): Any? {
+        val value = evaluate(expr.value)
+        environment.assign(expr.name, value)
+        return value
     }
 
     private fun evaluate(expr: Expr): Any? {
@@ -135,23 +144,10 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         if (a is Double && b is Double) {
             return a + b
         } else if (a is String || b is String) {
-            var aStr = when(a) {
-                is String -> a
-                is Boolean, is Double -> a.toString()
-                null -> "nil"
-                else -> throw RuntimeException("Cannot convert $a to string for concatenation")
-            }
-            var bStr = when(b) {
-                is String -> b
-                is Boolean, is Double -> b.toString()
-                null -> "nil"
-                else -> throw RuntimeException("Cannot convert $b to string for concatenation")
-            }
-            
-            return aStr + bStr
+            return stringify(a) + stringify(b)
         }
 
-        throw RuntimeError("Cannot add $a.javaClass.kotlin.qualifiedName and $b.javaClass.kotlin.qualifiedName")
+        throw RuntimeError("Cannot add $a and $b")
     }
 
     private fun isEqual(a: Any?, b: Any?): Boolean {
@@ -170,6 +166,12 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         else if (value is String) return value.length > 0
         else if (value is Number) return value != 0.0
         else if (value is Boolean) return value
-        else throw RuntimeError("Cannot evaluate truthiness on type: $value.javaClass.kotlin.qualifiedName")
+        else throw RuntimeError("Cannot evaluate truthiness on type: $value")
+    }
+
+    fun stringify(value: Any?): String {
+        if (value == null) return "nil"
+        if (value is String) return value;
+        return value.toString()
     }
 }

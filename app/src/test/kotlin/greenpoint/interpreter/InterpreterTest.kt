@@ -3,6 +3,7 @@ package greenpoint.interpreter
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+
 data class ITest(
     val input: String,
     val expected: Any?,
@@ -103,7 +104,6 @@ class InterpreterTest {
         val interpreter = Interpreter()
 
         for (test in tests) {
-            println(test.input)
             var result: Any? = null
             var raisedError = false
 

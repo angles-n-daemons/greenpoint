@@ -35,7 +35,6 @@ class ParserTest {
         for (test in tests) {
             val scanner = Scanner(test)
             val parser = Parser(scanner.scanTokens())
-            var raisedError = false
             parser.parse()
             assertTrue(parser.errors.size > 0)
         }
