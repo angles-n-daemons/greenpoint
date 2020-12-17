@@ -5,7 +5,7 @@ import java.util.HashMap
 import greenpoint.scanner.Token
 import greenpoint.scanner.TokenType
 
-class Environment() {
+class Environment(val enclosing: Environment? = null) {
     protected val values: HashMap<String, Any?> = HashMap<String, Any?>()
 
     fun define(name: Token, value: Any?) {
@@ -26,6 +26,10 @@ class Environment() {
 
         if (values.containsKey(name.lexeme)) {
             return values.get(name.lexeme)
+        }
+
+        if (enclosing != null) {
+            return enclosing.get(name)
         }
 
         throw RuntimeError("Undefined variable '${name.lexeme}'")
