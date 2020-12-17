@@ -9,19 +9,34 @@ class Environment(val enclosing: Environment? = null) {
     protected val values: HashMap<String, Any?> = HashMap<String, Any?>()
 
     fun define(name: Token, value: Any?) {
+        if (name.type != TokenType.IDENTIFIER) {
+            throw wrongTokenError(name)
+        }
+
         values.put(name.lexeme, value)
     }
 
     fun assign(name: Token, value: Any?) {
-        if (!values.containsKey(name.lexeme)) {
-            throw RuntimeError("Undefined variable ${name.lexeme}")
+        if (name.type != TokenType.IDENTIFIER) {
+            throw wrongTokenError(name)
         }
-        values.put(name.lexeme, value)
+
+        if (values.containsKey(name.lexeme)) {
+            values.put(name.lexeme, value)
+            return
+        }
+
+        if (enclosing != null) {
+            enclosing.assign(name, value)
+            return
+        }
+
+        throw RuntimeError("Undefined variable ${name.lexeme}")
     }
 
     fun get(name: Token): Any? {
         if (name.type != TokenType.IDENTIFIER) {
-            throw RuntimeError("Bad interpreter, attempted to retrieve variable with ${name.type}")
+            throw wrongTokenError(name)
         }
 
         if (values.containsKey(name.lexeme)) {
@@ -33,5 +48,9 @@ class Environment(val enclosing: Environment? = null) {
         }
 
         throw RuntimeError("Undefined variable '${name.lexeme}'")
+    }
+
+    private fun wrongTokenError(name: Token): RuntimeError {
+        return RuntimeError("Bad interpreter, attempted to retrieve variable with ${name.type}")
     }
 }
