@@ -60,7 +60,15 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
     }
 
     override fun visitAssignExpr(expr: Expr.Assign): String {
-        return "${expr.name.lexeme} = ${expr.value.accept(this)}"
+        return parenthesize(expr.name.lexeme, expr.value)
+    }
+
+    override fun visitLogicAndOrExpr(expr: Expr.LogicAndOr): String {
+        return parenthesize(
+            expr.op.lexeme,
+            expr.left,
+            expr.right,
+        )
     }
 
     private fun parenthesize(name: String, vararg exprs: Expr): String {

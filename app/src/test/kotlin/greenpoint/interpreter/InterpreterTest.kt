@@ -63,6 +63,19 @@ class InterpreterTest {
             ITest("4 != 3", true),
             ITest("\"3\" != 3", true),
 
+            // logical and or
+            ITest("true or false", true),
+            ITest("false or true", true),
+            ITest("true or true", true),
+            ITest("false or false", false),
+            ITest("true and false", false),
+            ITest("false and true", false),
+            ITest("true and true", true),
+            ITest("false and false", false),
+            ITest("\"\" or false", false),
+            ITest("\"ello\" or false", true),
+            ITest("false or 6 == \" something\"", false),
+
             // test ternary operations
             ITest("true ? 1 : 2", 1.0),
             ITest("false ? 1 : 2", 2.0),

@@ -94,7 +94,6 @@ class Parser(val tokens: List<Token>){
         val expr = ternary()
 
         if (match(TokenType.EQUAL)) {
-            val equals = previous()
             val value = assignment()
             if (expr is Expr.Variable) {
                 val name = expr.name
@@ -108,7 +107,7 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun ternary(): Expr {
-        var expr = equality()
+        var expr = logicAndOr()
 
         if (match(TokenType.QUESTION)) {
             val left = equality()
@@ -117,6 +116,18 @@ class Parser(val tokens: List<Token>){
             expr = Expr.Ternary(expr, left, right)
         }
 
+        return expr
+    }
+
+    private fun logicAndOr(): Expr {
+        var expr = equality()
+
+        if (match(TokenType.AND, TokenType.OR)) {
+            val op = previous()
+            val right = equality()
+            expr = Expr.LogicAndOr(expr, op, right)
+        }
+        
         return expr
     }
 

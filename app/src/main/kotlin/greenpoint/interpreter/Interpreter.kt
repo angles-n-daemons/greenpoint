@@ -104,6 +104,16 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         return expr.value
     }
 
+    override fun visitLogicAndOrExpr(expr: Expr.LogicAndOr): Any? {
+        val left = evaluate(expr.left)
+        val right = evaluate(expr.right)
+        when(expr.op.type) {
+            TokenType.AND -> return isTruthy(left) && isTruthy(right)
+            TokenType.OR -> return isTruthy(left) || isTruthy(right)
+            else -> throw RuntimeError("Parse error cannot do logical and/or with ${expr.op.type}")
+        }
+    }
+
     override fun visitGroupExpr(expr: Expr.Group): Any? {
         return evaluate(expr.expr)
     }
