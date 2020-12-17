@@ -31,18 +31,34 @@ class ScannerError(
 
 class Scanner(val source: String) {
     val tokens = mutableListOf<Token>()
+    var errors = mutableListOf<Exception>()
     var start = 0
     var current = 0
     var line = 1
 
     fun scanTokens(): List<Token> {
         while (!isAtEnd()) {
-            val token = scanTokenMaybe()
-            if (token != null) {
-                tokens.add(token)
+            try {
+                val token = scanTokenMaybe()
+                if (token != null) {
+                    tokens.add(token)
+                }
+            } catch (e: Exception) {
+                errors.add(e)
             }
+            start = current
         }
         return tokens
+    }
+
+    fun hasErrors(): Boolean {
+        return errors.size > 0
+    }
+
+    fun printErrors() {
+        for (err in errors) {
+            println(err)
+        }
     }
 
     fun scanTokenMaybe(): Token? {

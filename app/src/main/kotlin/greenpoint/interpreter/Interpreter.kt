@@ -14,12 +14,23 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 	fun run(source: String): Any? {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
+        if (scanner.hasErrors()) {
+            scanner.printErrors()
+            return null
+        }
+
         val parser = Parser(tokens)
         val statements = parser.parse()
-        for (statement in statements) {
-            execute(statement)
+        if (parser.hasErrors()) {
+            parser.printErrors()
+            return null
         }
-        return null
+
+        var result: Any? = null
+        for (statement in statements) {
+            result = execute(statement)
+        }
+        return result
 	}
 
     fun runExpression(source: String): Any? {
@@ -45,9 +56,8 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print): Any? {
-        val value = evaluate(stmt.expr)
-        println(value)
-        return value
+        println(evaluate(stmt.expr))
+        return null
     }
 
     override fun visitVarStmt(stmt: Stmt.Var): Any? {

@@ -32,6 +32,16 @@ class Parser(val tokens: List<Token>){
         return declaration()
     }
 
+    fun hasErrors(): Boolean {
+        return errors.size > 0
+    }
+
+    fun printErrors() {
+        for (err in errors) {
+            println(err)
+        }
+    }
+
     private fun declaration(): Stmt {
         if (match(TokenType.VAR)) return varDeclaration()
         return statement()
@@ -44,13 +54,13 @@ class Parser(val tokens: List<Token>){
 
     private fun printStmt(): Stmt {
         val expr = expression()
-        consume(TokenType.SEMICOLON, "Expecting ';' after value")
+        consume(TokenType.SEMICOLON, "Expecting ';' after print statement")
         return Stmt.Print(expr)
     }
 
     private fun expressionStmt(): Stmt {
         val expr = expression()
-        consume(TokenType.SEMICOLON, "Expecting ';' after print statement")
+        consume(TokenType.SEMICOLON, "Expecting ';' after statement")
         return Stmt.Expression(expr)
     }
 

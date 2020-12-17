@@ -210,7 +210,7 @@ class ScannerTest {
         } catch(e: Exception) {
             raised = true
         }
-        assertTrue(raised)
+        assertTrue(scanner.hasErrors())
     }
 
     @Test fun testScannerScanTokenNewline() {

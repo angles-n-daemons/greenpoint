@@ -91,8 +91,8 @@ class InterpreterTest {
             ITest("var tree = 8", null, true),
             
             // print examples
-            ITest("print 5 + 6;", 11.0),
-            ITest("print 4 / 6;", 4.0/6.0),
+            ITest("print 5 + 6;", null),
+            ITest("print 4 / 6;", null),
             // no semi colon
             ITest("print 4 / 6", null, true),
 
@@ -103,6 +103,7 @@ class InterpreterTest {
         val interpreter = Interpreter()
 
         for (test in tests) {
+            println(test.input)
             var result: Any? = null
             var raisedError = false
 
