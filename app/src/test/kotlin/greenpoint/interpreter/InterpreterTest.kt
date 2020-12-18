@@ -104,10 +104,6 @@ class InterpreterTest {
             // no semi colon
             ITest("var tree = 8", null, true),
             
-            // print examples
-            ITest("print 5 + 6;", null),
-            ITest("print 4 / 6;", null),
-            // no semi colon
             ITest("print 4 / 6", null, true),
 
             // expression examples
