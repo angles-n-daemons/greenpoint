@@ -132,4 +132,18 @@ class InterpreterTest {
             assertEquals(test.expected, result)
         }
     }
+
+    @Test fun testInterpreterPrinter() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        val interpreter = Interpreter(::fakePrint)
+        interpreter.run("print 3;")
+        assertEquals(
+            "3.0",
+            printedMessage,
+        )
+    }
 }

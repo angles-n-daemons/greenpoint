@@ -60,7 +60,7 @@ class Interpreter(
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print): Any? {
-        println(stringify(evaluate(stmt.expr)))
+        printer(stringify(evaluate(stmt.expr)))
         return null
     }
 
