@@ -13,7 +13,7 @@ class RuntimeError(message: String): RuntimeException(message)
 class Interpreter(
     private val printer: (message: Any?) -> Unit = ::println,
 ): Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
-    private val environment = Environment()
+    private var environment = Environment()
 
 	fun run(source: String): Any? {
         val scanner = Scanner(source)
@@ -75,7 +75,16 @@ class Interpreter(
     }
 
     override fun visitBlockStmt(stmt: Stmt.Block): Any? {
-        throw RuntimeError("not yet able to handle block statements")
+        val previous = environment
+        try {
+            environment = Environment(environment)
+            for (statement in stmt.statements) {
+                execute(statement)
+            }
+        } finally {
+            this.environment = previous
+        }
+        return null
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {

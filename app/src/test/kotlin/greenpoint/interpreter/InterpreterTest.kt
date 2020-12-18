@@ -142,4 +142,65 @@ class InterpreterTest {
             printedMessage,
         )
     }
+
+    @Test fun testInterpreterBlock() {
+        val printedMessages = mutableListOf<Any?>()
+        fun fakePrint(message: Any?): Unit {
+            printedMessages.add(message)
+        }
+
+        val interpreter = Interpreter(::fakePrint)
+        interpreter.run("""
+			var a = "global a";
+			var b = "global b";
+			var c = "global c";
+			{
+			  var a = "outer a";
+			  var b = "outer b";
+			  {
+			    var a = "inner a";
+			    print a;
+			    print b;
+			    print c;
+			  }
+			  print a;
+			  print b;
+			  print c;
+			}
+			print a;
+			print b;
+			print c;
+        """)
+        assertEquals(
+            mutableListOf<Any?>(
+                "inner a",
+                "outer b",
+                "global c",
+                "outer a",
+                "outer b",
+                "global c",
+                "global a",
+                "global b",
+                "global c",
+            ),
+            printedMessages,
+        )
+    }
+
+    @Test fun testInterpreterBlockFailure() {
+        // test regular example
+
+        // test failure case - bubbles environment reset to original
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        val interpreter = Interpreter(::fakePrint)
+        interpreter.run("print 3;")
+        assertEquals(
+            "3.0",
+            printedMessage,
+        )
+    }
 }
