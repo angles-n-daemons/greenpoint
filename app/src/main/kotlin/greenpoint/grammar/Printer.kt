@@ -24,6 +24,10 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
         }
     }
 
+    override fun visitBlockStmt(stmt: Stmt.Block): String {
+        return "I Dont do blocks"
+    }
+
     override fun visitBinaryExpr(expr: Expr.Binary): String {
         return parenthesize(
             expr.op.lexeme,

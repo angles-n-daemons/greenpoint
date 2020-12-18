@@ -113,6 +113,8 @@ class InterpreterTest {
             // expression examples
             ITest("5 * 3;", 15.0),
             ITest("5 * 3", null, true),
+
+            ITest("{var snack = 4; print 4;", null, true),
         )
         val interpreter = Interpreter()
 

@@ -17,7 +17,7 @@ sealed class Expr {
         fun visitLogicAndOrExpr(expr: LogicAndOr): R
     }
 
-    class Binary( 
+    data class Binary( 
         val left: Expr,
         val op: Token,
         val right: Expr,
@@ -27,7 +27,7 @@ sealed class Expr {
         }
     }
 
-    class Unary(
+    data class Unary(
         val op: Token,
         val expr: Expr,
     ): Expr() {
@@ -36,19 +36,19 @@ sealed class Expr {
         }
     }
 
-    class Group(val expr: Expr): Expr() {
+    data class Group(val expr: Expr): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitGroupExpr(this)
         }
     }
 
-    class ExprList(val expressions: List<Expr>): Expr() {
+    data class ExprList(val expressions: List<Expr>): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitExprListExpr(this)
         }
     }
 
-    class Ternary(
+    data class Ternary(
         val condition: Expr,
         val left: Expr,
         val right: Expr,
@@ -58,19 +58,19 @@ sealed class Expr {
         }
     }
 
-    class Literal(val value: Any?): Expr() {
+    data class Literal(val value: Any?): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitLiteralExpr(this)
         }
     }
 
-    class Variable(val name: Token): Expr() {
+    data class Variable(val name: Token): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitVariableExpr(this)
         }
     }
 
-    class Assign(
+    data class Assign(
         val name: Token,
         val value: Expr,
     ): Expr() {
@@ -79,7 +79,7 @@ sealed class Expr {
         }
     }
 
-    class LogicAndOr(
+    data class LogicAndOr(
         val left: Expr,
         val op: Token,
         val right: Expr,

@@ -5,7 +5,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 import greenpoint.grammar.Expr
+import greenpoint.grammar.Stmt
 import greenpoint.scanner.Token
+import greenpoint.scanner.TokenType
 import greenpoint.scanner.Scanner
 import greenpoint.grammar.ASTPrinter
 
@@ -18,8 +20,6 @@ class ParserTest {
         if (stmts.size == 0) {
             throw Exception("parser parsed no statements")
         }
-        println("(wallet = (list (ternary (! (group (== (+ 5.0 (* johnson (group (/ 3.0 1.0)))) 4.0))) hello goodbye) (+ 5.0 9.0)))")
-        println(printer.print(stmts[0]))
         assertEquals(
             "(wallet = (list (ternary (! (group (== (+ 5.0 (* johnson (group (/ 3.0 1.0)))) 4.0))) hello goodbye) (+ 5.0 9.0)))",
             printer.print(stmts[0]),
@@ -38,5 +38,22 @@ class ParserTest {
             parser.parse()
             assertTrue(parser.errors.size > 0)
         }
+    }
+
+    @Test fun testBlock() {
+        val stmts = Parser(Scanner("""{
+            var a = 3;
+            print 4;
+        }""").scanTokens()).parse()
+        val expected = mutableListOf<Stmt>(
+            Stmt.Block(mutableListOf<Stmt>(
+                Stmt.Var(Token(TokenType.IDENTIFIER, "a", null, 2), Expr.Literal(3.0)),
+                Stmt.Print(Expr.Literal(4.0)),
+            )),
+        )
+        assertEquals(
+            expected,
+            stmts,
+        )
     }
 }

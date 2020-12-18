@@ -9,9 +9,10 @@ sealed class Stmt {
         fun visitExpressionStmt(stmt: Expression): R
         fun visitPrintStmt(stmt: Print): R
         fun visitVarStmt(stmt: Var): R
+        fun visitBlockStmt(stmt: Block): R
     }
 
-    class Expression(
+    data class Expression(
         val expr: Expr,
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
@@ -19,7 +20,7 @@ sealed class Stmt {
         }
     }
 
-    class Print(
+    data class Print(
         val expr: Expr,
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
@@ -27,12 +28,18 @@ sealed class Stmt {
         }
     }
 
-    class Var(
+    data class Var(
         val name: Token,
         val initializer: Expr?,
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitVarStmt(this)
+        }
+    }
+
+    data class Block(val statements: List<Stmt>): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitBlockStmt(this)
         }
     }
 }

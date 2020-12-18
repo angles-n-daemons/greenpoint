@@ -10,7 +10,9 @@ import greenpoint.grammar.Stmt
 
 class RuntimeError(message: String): RuntimeException(message)
 
-class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
+class Interpreter(
+    private val printer: (message: Any?) -> Unit = ::println,
+): Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     private val environment = Environment()
 
 	fun run(source: String): Any? {
@@ -70,6 +72,10 @@ class Interpreter: Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 
         environment.define(stmt.name, value)
         return null
+    }
+
+    override fun visitBlockStmt(stmt: Stmt.Block): Any? {
+        throw RuntimeError("not yet able to handle block statements")
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
