@@ -13,6 +13,10 @@ class Environment(val enclosing: Environment? = null) {
             throw wrongTokenError(name)
         }
 
+        if (values.containsKey(name.lexeme)) {
+            throw RuntimeError("Variable '${name.lexeme}' already defined")
+        }
+
         values.put(name.lexeme, value)
     }
 

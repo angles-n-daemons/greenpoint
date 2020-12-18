@@ -16,15 +16,22 @@ class EnvironmentTest {
         val env = Environment()
         env.define(tokenGuy("a"), null)
         env.define(tokenGuy("b"), 5.0)
-        env.define(tokenGuy("c"), 5.0)
-        env.define(tokenGuy("c"), "i was changed")
+        env.define(tokenGuy("c"), "cant be redefined")
 
         assertEquals(env.get(tokenGuy("a")), null)
         assertEquals(env.get(tokenGuy("b")), 5.0)
-        assertEquals(env.get(tokenGuy("c")), "i was changed")
+        assertEquals(env.get(tokenGuy("c")), "cant be redefined")
 
         env.assign(tokenGuy("c"), "i was changed again!")
         assertEquals(env.get(tokenGuy("c")), "i was changed again!")
+
+        var errored = false
+        try {
+            env.define(tokenGuy("c"), "try to redefine existing var")
+        } catch(e: Exception) {
+            errored = true
+        }
+        assertTrue(errored)
     }
 
     @Test fun testEnvironmentWrongTokenType() {
@@ -72,7 +79,7 @@ class EnvironmentTest {
 
         var errored = false
         try {
-            env.assign(tokenGuy("a"), "i was changed again!")
+            env.assign(tokenGuy("a"), "cant assign an undefined var")
         } catch(e: Exception) {
             errored = true
         }
