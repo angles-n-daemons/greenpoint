@@ -10,6 +10,7 @@ sealed class Stmt {
         fun visitPrintStmt(stmt: Print): R
         fun visitVarStmt(stmt: Var): R
         fun visitBlockStmt(stmt: Block): R
+        fun visitIfStmt(stmt: If): R
     }
 
     data class Expression(
@@ -40,6 +41,16 @@ sealed class Stmt {
     data class Block(val statements: List<Stmt>): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitBlockStmt(this)
+        }
+    }
+
+    data class If(
+        val condition: Expr,
+        val thenStmt: Stmt,
+        val elseStmt: Stmt?,
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitIfStmt(this)
         }
     }
 }

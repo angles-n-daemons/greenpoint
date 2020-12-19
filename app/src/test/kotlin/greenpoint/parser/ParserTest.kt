@@ -56,4 +56,36 @@ class ParserTest {
             stmts,
         )
     }
+
+    @Test fun testIf() {
+        val stmts = Parser(Scanner("""
+        if (a > 0) {
+            b = a;
+        } else {
+            b = 0;
+        }""").scanTokens()).parse()
+        val expected = mutableListOf<Stmt>(Stmt.If(
+            Expr.Binary(
+                Expr.Variable(Token(TokenType.IDENTIFIER, "a", null, 2)),
+                Token(TokenType.GREATER, ">", null, 2),
+                Expr.Literal(0.0),
+            ),
+            Stmt.Block(mutableListOf<Stmt>(
+                Stmt.Expression(Expr.Assign(
+                    Token(TokenType.IDENTIFIER, "b", null, 3),
+                    Expr.Variable(Token(TokenType.IDENTIFIER, "a", null, 3)),
+                )),
+            )),
+            Stmt.Block(mutableListOf<Stmt>(
+                Stmt.Expression(Expr.Assign(
+                    Token(TokenType.IDENTIFIER, "b", null, 5),
+                    Expr.Literal(0.0),
+                )),
+            )),
+        ))
+        assertEquals(
+            expected,
+            stmts,
+        )
+    }
 }

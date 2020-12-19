@@ -28,6 +28,10 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
         return "I Dont do blocks"
     }
 
+    override fun visitIfStmt(stmt: Stmt.If): String {
+        return "nor do i do ifs"
+    }
+
     override fun visitBinaryExpr(expr: Expr.Binary): String {
         return parenthesize(
             expr.op.lexeme,

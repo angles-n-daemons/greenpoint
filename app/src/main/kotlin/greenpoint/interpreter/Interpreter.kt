@@ -64,6 +64,15 @@ class Interpreter(
         return null
     }
 
+    override fun visitIfStmt(stmt: Stmt.If): Any? {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenStmt)
+        } else if (stmt.elseStmt != null) {
+            execute(stmt.elseStmt)
+        }
+        return null
+    }
+
     override fun visitVarStmt(stmt: Stmt.Var): Any? {
         var value: Any? = null
         if (stmt.initializer != null) {

@@ -48,9 +48,24 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun statement(): Stmt {
+        if (match(TokenType.IF)) return ifStmt()
         if (match(TokenType.PRINT)) return printStmt()
         if (match(TokenType.LEFT_BRACE)) return block()
         return expressionStmt()
+    }
+
+    private fun ifStmt(): Stmt {
+        consume(TokenType.LEFT_PAREN, "Expecting '(' after 'if'")
+        val condition = expression()
+        consume(TokenType.RIGHT_PAREN, "Expecting closing ')' after 'if' condition")
+        
+        val thenStmt = statement()
+        var elseStmt: Stmt? = null
+        if (match(TokenType.ELSE)) {
+            elseStmt = statement()
+        }
+
+        return Stmt.If(condition, thenStmt, elseStmt)
     }
 
     private fun printStmt(): Stmt {
