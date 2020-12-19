@@ -2,6 +2,7 @@ package greenpoint.interpreter
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 
 data class ITest(
@@ -187,20 +188,30 @@ class InterpreterTest {
         )
     }
 
-    @Test fun testInterpreterBlockFailure() {
-        // test regular example
-
-        // test failure case - bubbles environment reset to original
-        var printedMessage: Any? = ""
+    @Test fun testInterpreterIf() {
+        val printedMessages = mutableListOf<Any?>()
         fun fakePrint(message: Any?): Unit {
-            printedMessage = message
+            printedMessages.add(message)
+        }
+        
+        Interpreter(::fakePrint).run("""
+        var a = 4;
+        if (a > 3) {
+            print "a";
+        } else {
+            print "b";
         }
 
-        val interpreter = Interpreter(::fakePrint)
-        interpreter.run("print 3;")
+        if (a < 3) {
+            print "c";
+        } else {
+            print "d";
+        }
+        """)
+
         assertEquals(
-            "3.0",
-            printedMessage,
+            mutableListOf<Any?>("a", "d"),
+            printedMessages,
         )
     }
 }
