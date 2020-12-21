@@ -195,7 +195,7 @@ class InterpreterTest {
         }
         
         Interpreter(::fakePrint).run("""
-        var a = 4;
+            var a = 4;
             if (a > 3) {
                 print "a";
             } else {
@@ -212,6 +212,22 @@ class InterpreterTest {
         assertEquals(
             mutableListOf<Any?>("a", "d"),
             printedMessages,
+        )
+    }
+
+    @Test fun testInterpreterLogical() {
+        var printedMessage: Any? = null
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            print(true and false or true and false);
+        """)
+
+        assertEquals(
+            "false",
+            printedMessage,
         )
     }
 }

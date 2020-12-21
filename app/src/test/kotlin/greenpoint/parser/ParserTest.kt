@@ -113,4 +113,23 @@ class ParserTest {
             stmts,
         )
     }
+
+    @Test fun testLogical() {
+        val stmts = Parser(Scanner("""true or false and true;""").scanTokens()).parse()
+        val expected = mutableListOf<Stmt>(Stmt.Expression(
+            Expr.Logical(
+                Expr.Literal(true),
+                Token(TokenType.OR, "or", null, 1),
+                Expr.Logical(
+                    Expr.Literal(false),
+                    Token(TokenType.AND, "and", null, 1),
+                    Expr.Literal(true),
+                ),
+            ),
+        ))
+        assertEquals(
+            expected,
+            stmts,
+        )
+    }
 }
