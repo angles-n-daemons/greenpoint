@@ -32,6 +32,10 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
         return "nor do i do ifs"
     }
 
+    override fun visitWhileStmt(stmt: Stmt.While): String {
+        return "dont do while"
+    }
+
     override fun visitBinaryExpr(expr: Expr.Binary): String {
         return parenthesize(
             expr.op.lexeme,

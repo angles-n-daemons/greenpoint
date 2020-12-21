@@ -132,4 +132,31 @@ class ParserTest {
             stmts,
         )
     }
+
+    @Test fun testWhile() {
+        val stmts = Parser(Scanner("""
+            while(a < 3) { a = a + 1; }
+        """).scanTokens()).parse()
+        val expected = mutableListOf<Stmt>(Stmt.While(
+            Expr.Binary(
+                Expr.Variable(Token(TokenType.IDENTIFIER, "a", null, 2)),
+                Token(TokenType.LESS, "<", null, 2),
+                Expr.Literal(3.0),
+            ),
+            Stmt.Block(mutableListOf<Stmt>(
+                Stmt.Expression(Expr.Assign(
+                    Token(TokenType.IDENTIFIER, "a", null, 2),
+                    Expr.Binary(
+                        Expr.Variable(Token(TokenType.IDENTIFIER, "a", null, 2)),
+                        Token(TokenType.PLUS, "+", null, 2),
+                        Expr.Literal(1.0),
+                    ),
+                )),
+            )),
+        ))
+        assertEquals(
+            expected,
+            stmts,
+        )
+    }
 }

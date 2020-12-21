@@ -64,6 +64,13 @@ class Interpreter(
         return null
     }
 
+    override fun visitWhileStmt(stmt: Stmt.While): Any? {
+        while(isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body)
+        }
+        return null
+    }
+
     override fun visitIfStmt(stmt: Stmt.If): Any? {
         if (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.thenStmt)
