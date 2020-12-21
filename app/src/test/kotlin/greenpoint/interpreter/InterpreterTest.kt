@@ -196,17 +196,17 @@ class InterpreterTest {
         
         Interpreter(::fakePrint).run("""
         var a = 4;
-        if (a > 3) {
-            print "a";
-        } else {
-            print "b";
-        }
+            if (a > 3) {
+                print "a";
+            } else {
+                print "b";
+            }
 
-        if (a < 3) {
-            print "c";
-        } else {
-            print "d";
-        }
+            if (a < 3) {
+                print "c";
+            } else {
+                print "d";
+            }
         """)
 
         assertEquals(

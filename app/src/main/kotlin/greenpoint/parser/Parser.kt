@@ -133,27 +133,31 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun ternary(): Expr {
-        var expr = logicAndOr()
+        var expr = logicOr()
 
         if (match(TokenType.QUESTION)) {
-            val left = equality()
+            val left = logicOr()
             consume(TokenType.COLON, "Missing colon in ternary expression")
-            val right = equality()
+            val right = logicOr()
             expr = Expr.Ternary(expr, left, right)
         }
 
         return expr
     }
 
-    private fun logicAndOr(): Expr {
-        var expr = equality()
-
-        if (match(TokenType.AND, TokenType.OR)) {
-            val op = previous()
-            val right = equality()
-            expr = Expr.LogicAndOr(expr, op, right)
+    private fun logicOr(): Expr {
+        var expr = logicAnd()
+        if (match(TokenType.OR)) {
+            expr = Expr.Logical(expr, previous(), logicAnd())
         }
-        
+        return expr
+    }
+
+    private fun logicAnd(): Expr {
+        var expr = equality()
+        if (match(TokenType.AND)) {
+            expr = Expr.Logical(expr, previous(), equality())
+        }
         return expr
     }
 

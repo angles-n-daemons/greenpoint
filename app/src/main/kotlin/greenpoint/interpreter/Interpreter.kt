@@ -114,6 +114,24 @@ class Interpreter(
         }
     }
 
+    override fun visitLogicalExpr(expr: Expr.Logical): Any? {
+        val left = isTruthy(evaluate(expr.left))
+        // short circuit conditions
+        if (left && expr.op.type == TokenType.OR) {
+            return true
+        }
+        if (!left && expr.op.type == TokenType.AND) {
+            return false
+        }
+
+        val right = isTruthy(evaluate(expr.right))
+        when (expr.op.type) {
+            TokenType.AND -> return left && right
+            TokenType.OR -> return left || right
+            else -> throw RuntimeError("Unknown operator or comparator $expr.op.type")
+        }
+    }
+
     override fun visitUnaryExpr(expr: Expr.Unary): Any? {
         val right = evaluate(expr.expr)
 
@@ -126,16 +144,6 @@ class Interpreter(
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {
         return expr.value
-    }
-
-    override fun visitLogicAndOrExpr(expr: Expr.LogicAndOr): Any? {
-        val left = evaluate(expr.left)
-        val right = evaluate(expr.right)
-        when(expr.op.type) {
-            TokenType.AND -> return isTruthy(left) && isTruthy(right)
-            TokenType.OR -> return isTruthy(left) || isTruthy(right)
-            else -> throw RuntimeError("Parse error cannot do logical and/or with ${expr.op.type}")
-        }
     }
 
     override fun visitGroupExpr(expr: Expr.Group): Any? {

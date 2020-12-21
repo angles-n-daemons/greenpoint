@@ -14,7 +14,7 @@ sealed class Expr {
         fun visitTernaryExpr(expr: Ternary): R
         fun visitVariableExpr(expr: Variable): R
         fun visitAssignExpr(expr: Assign): R
-        fun visitLogicAndOrExpr(expr: LogicAndOr): R
+        fun visitLogicalExpr(expr: Logical): R
     }
 
     data class Binary( 
@@ -79,13 +79,13 @@ sealed class Expr {
         }
     }
 
-    data class LogicAndOr(
+    data class Logical(
         val left: Expr,
         val op: Token,
         val right: Expr,
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
-            return visitor.visitLogicAndOrExpr(this)
+            return visitor.visitLogicalExpr(this)
         }
     }
 }
