@@ -159,4 +159,44 @@ class ParserTest {
             stmts,
         )
     }
+
+    @Test fun testFor() {
+        val stmts = Parser(Scanner("""
+            for(var i = 0; i < 10; i = i + 1) {
+                print i;
+            }
+        """).scanTokens()).parse()
+        val expected = mutableListOf<Stmt>(Stmt.Block(mutableListOf<Stmt>(
+            Stmt.Var(
+                Token(TokenType.IDENTIFIER, "i", null, 2),
+                Expr.Literal(0.0),
+            ),
+            Stmt.While(
+                Expr.Binary(
+                    Expr.Variable(Token(TokenType.IDENTIFIER, "i", null, 2)),
+                    Token(TokenType.LESS, "<", null, 2),
+                    Expr.Literal(10.0),
+                ),
+                Stmt.Block(mutableListOf<Stmt>(
+                    Stmt.Block(mutableListOf<Stmt>(
+                        Stmt.Print(Expr.Variable(
+                            Token(TokenType.IDENTIFIER, "i", null, 3),
+                        )),
+                    )),
+                    Stmt.Expression(Expr.Assign(
+                        Token(TokenType.IDENTIFIER, "i", null, 2),
+                        Expr.Binary(
+                            Expr.Variable(Token(TokenType.IDENTIFIER, "i", null, 2)),
+                            Token(TokenType.PLUS, "+", null, 2),
+                            Expr.Literal(1.0),
+                        ),
+                    )),
+                )),
+            ),
+        )))
+        assertEquals(
+            expected,
+            stmts,
+        )
+    }
 }

@@ -48,6 +48,7 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun statement(): Stmt {
+        if (match(TokenType.FOR)) return forStmt()
         if (match(TokenType.IF)) return ifStmt()
         if (match(TokenType.PRINT)) return printStmt()
         if (match(TokenType.WHILE)) return whileStmt()
@@ -56,11 +57,49 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun whileStmt(): Stmt {
-        consume(TokenType.LEFT_PAREN, "Expect '(' after while")
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'")
         val condition = expression()
-        consume(TokenType.RIGHT_PAREN, "Expect closing ')' after while condition")
+        consume(TokenType.RIGHT_PAREN, "Expect closing ')' after 'while' condition")
         val body = statement()
         return Stmt.While(condition, body)
+    }
+
+    private fun forStmt(): Stmt {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'")
+
+        var initializer: Stmt? = null
+        if (match(TokenType.SEMICOLON)) {
+            // do nothing
+        } else if (match(TokenType.VAR)) {
+            initializer = varDeclaration();
+        } else {
+            initializer = expressionStmt()
+        }
+
+        // default true if no condition present
+        var condition: Expr = Expr.Literal(true)
+        if (!check(TokenType.SEMICOLON)) {
+            condition = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expect ';' after loop condition")
+
+        var increment: Expr? = null
+        if (!check(TokenType.RIGHT_PAREN)) {
+            increment = expression()
+        }
+        consume(TokenType.RIGHT_PAREN, "Expect closing ')' after 'for' clauses")
+
+        var body = statement()
+        if (increment != null) {
+            body = Stmt.Block(mutableListOf<Stmt>(body, Stmt.Expression(increment)))
+        }
+
+        body = Stmt.While(condition, body)
+
+        if (initializer != null) {
+            body = Stmt.Block(mutableListOf<Stmt>(initializer, body))
+        }
+        return body
     }
 
     private fun ifStmt(): Stmt {

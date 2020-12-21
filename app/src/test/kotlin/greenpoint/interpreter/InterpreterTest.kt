@@ -250,4 +250,22 @@ class InterpreterTest {
             printedMessages,
         )
     }
+
+    @Test fun testInterpreterFor() {
+        val printedMessages = mutableListOf<Any?>()
+        fun fakePrint(message: Any?): Unit {
+            printedMessages.add(message)
+        }
+
+        Interpreter(::fakePrint).run("""
+            for (var i = 0; i < 3; i = i + 1) {
+                print i;
+            }
+        """)
+
+        assertEquals(
+            mutableListOf<Any?>("0.0", "1.0", "2.0"),
+            printedMessages,
+        )
+    }
 }
