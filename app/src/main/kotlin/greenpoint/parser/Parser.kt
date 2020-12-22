@@ -43,6 +43,7 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun declaration(): Stmt {
+        if (match(TokenType.FUN)) return function("function")
         if (match(TokenType.VAR)) return varDeclaration()
         return statement()
     }
@@ -51,6 +52,7 @@ class Parser(val tokens: List<Token>){
         if (match(TokenType.FOR)) return forStmt()
         if (match(TokenType.IF)) return ifStmt()
         if (match(TokenType.PRINT)) return printStmt()
+        if (match(TokenType.RETURN)) return returnStmt()
         if (match(TokenType.WHILE)) return whileStmt()
         if (match(TokenType.LEFT_BRACE)) return block()
         return expressionStmt()
@@ -122,6 +124,16 @@ class Parser(val tokens: List<Token>){
         return Stmt.Print(expr)
     }
 
+    private fun returnStmt(): Stmt {
+        var value: Expr? = null
+        val keyword = previous()
+        if (!check(TokenType.SEMICOLON)) {
+            value = expression()
+        }
+        consume(TokenType.SEMICOLON, "Expecting ';' after return statement")
+        return Stmt.Return(keyword, value)
+    }
+
     private fun block(): Stmt {
         val statements = mutableListOf<Stmt>()
         while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
@@ -146,8 +158,28 @@ class Parser(val tokens: List<Token>){
             initializer = expression()
         }
 
-        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration")
         return Stmt.Var(name, initializer)
+    }
+
+    private fun function(kind: String): Stmt {
+        val name = consume(TokenType.IDENTIFIER, "Expect $kind name")
+        consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name")
+        val params = mutableListOf<Token>();
+        if (!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (params.size >= 255) {
+                    throw ParseError("Can't have more than 255 parameters for $kind ${name.lexeme}")
+                }
+                params.add(consume(TokenType.IDENTIFIER, "Expect parameter name"))
+
+            } while(match(TokenType.COMMA))
+        }
+        consume(TokenType.RIGHT_PAREN, "Expect closing ')' after $kind ${name.lexeme} parameters")
+
+        // Read function body
+        consume(TokenType.LEFT_BRACE, "Expect '{' to follow $kind definition for ${name.lexeme}")
+        return Stmt.Func(name, params, block())
     }
 
     private fun expression(): Expr {

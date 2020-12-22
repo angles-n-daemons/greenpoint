@@ -1,6 +1,7 @@
 package greenpoint.interpreter
 
 import greenpoint.scanner.Scanner
+import greenpoint.scanner.Token
 import greenpoint.scanner.TokenType
 
 import greenpoint.parser.Parser
@@ -8,12 +9,24 @@ import greenpoint.parser.Parser
 import greenpoint.grammar.Expr
 import greenpoint.grammar.Stmt
 
+import greenpoint.interpreter.function.Callable
+import greenpoint.interpreter.function.Func
+import greenpoint.interpreter.function.Return
+import greenpoint.interpreter.function.seedEnvironmentWithNatives
+
+
 class RuntimeError(message: String): RuntimeException(message)
+
 
 class Interpreter(
     private val printer: (message: Any?) -> Unit = ::println,
 ): Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
-    private var environment = Environment()
+    val globals = Environment()
+    private var environment = globals
+
+    init {
+        seedEnvironmentWithNatives(globals)
+    }
 
 	fun run(source: String): Any? {
         val scanner = Scanner(source)
@@ -59,6 +72,17 @@ class Interpreter(
         return evaluate(stmt.expr)
     }
 
+    override fun visitFuncStmt(stmt: Stmt.Func): Any? {
+        environment.define(stmt.name, Func(stmt))
+        return null
+    }
+
+    override fun visitReturnStmt(stmt: Stmt.Return): Any? {
+        var value: Any? = null
+        if (stmt.value != null) value = evaluate(stmt.value)
+        throw Return(value)
+    }
+
     override fun visitPrintStmt(stmt: Stmt.Print): Any? {
         printer(stringify(evaluate(stmt.expr)))
         return null
@@ -91,16 +115,28 @@ class Interpreter(
     }
 
     override fun visitBlockStmt(stmt: Stmt.Block): Any? {
-        val previous = environment
+        executeBlock(stmt, Environment(environment))
+        return null
+    }
+
+    fun executeBlock(
+        block: Stmt,
+        environment: Environment,
+    ) {
+        if (!(block is Stmt.Block)) {
+            throw RuntimeError("Unexpected: statement is not a block")
+        }
+
+        val previous = this.environment
         try {
-            environment = Environment(environment)
-            for (statement in stmt.statements) {
+            this.environment = environment
+            
+            for (statement in block.statements) {
                 execute(statement)
             }
         } finally {
             this.environment = previous
         }
-        return null
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any? {
@@ -150,7 +186,20 @@ class Interpreter(
     }
 
     override fun visitCallExpr(expr: Expr.Call): Any? {
-        throw RuntimeError("Sumting wong")
+        val callee = evaluate(expr.callee)
+        val argVals = mutableListOf<Any?>()
+        for (arg in expr.args) {
+            argVals.add(evaluate(arg))
+        }
+
+        if (callee is Callable) {
+            if (argVals.size != callee.arity()) {
+                throw RuntimeError("Expected ${callee.arity()} arguments but got ${argVals.size}")
+            }
+            return callee.call(this, argVals)
+        } else {
+            throw RuntimeError("Can only call functions and classes")
+        }
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {

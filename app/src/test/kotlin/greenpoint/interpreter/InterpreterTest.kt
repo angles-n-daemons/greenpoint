@@ -268,4 +268,127 @@ class InterpreterTest {
             printedMessages,
         )
     }
+
+    @Test fun testInterpreterSimpleFunction() {
+        var printedMessage:Any? = null
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            fun test() {
+                print "hello world";
+            }
+
+            test();
+        """)
+
+        assertEquals(
+            "hello world",
+            printedMessage,
+        )
+    }
+
+    @Test fun testInterpreterFunctionReturn() {
+        var printedMessage:Any? = null
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            fun sum(a, b) {
+                return a + b;
+            }
+
+            print sum(3, 4);
+        """)
+
+        assertEquals(
+            "7.0",
+            printedMessage,
+        )
+    }
+
+    @Test fun testInterpreterCallNonFunction() {
+        var errored = false;
+        try {
+            Interpreter().run("""
+                var test = "hello world";
+                test();
+            """)
+        } catch(e: RuntimeError) {
+            errored = true
+        }
+
+        assertTrue(errored)
+    }
+
+    @Test fun testInterpreterFunctionArityCheck() {
+        var errored = false;
+        try {
+            Interpreter().run("""
+                fun test(a, b) {
+                    print("hi");
+                }
+                test(1);
+            """)
+        } catch(e: RuntimeError) {
+            errored = true
+        }
+
+        assertTrue(errored)
+
+        errored = false;
+        try {
+            Interpreter().run("""
+                fun test(a, b) {
+                    print("hi");
+                }
+                test(1, 2, 3);
+            """)
+        } catch(e: RuntimeError) {
+            errored = true
+        }
+
+        assertTrue(errored)
+    }
+
+    @Test fun testFunctionEnvironments() {
+        var printedMessages = mutableListOf<Any?>()
+        fun fakePrint(message: Any?): Unit {
+            printedMessages.add(message)
+        }
+
+        Interpreter(::fakePrint).run("""
+            fun count(n) {
+                if (n > 1) count(n - 1);
+                print n;
+            }
+            count(3);
+        """)
+
+        assertEquals(
+            mutableListOf<Any?>("1.0", "2.0", "3.0"),
+            printedMessages,
+        )
+    }
+
+    @Test fun testClock() {
+        var printedMessage: String = ""
+        fun fakePrint(message: Any?): Unit {
+            if (!(message is String)) {
+                throw Exception("Expected printed time to be string")
+            }
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            print clock();
+        """)
+
+        val printedTime = printedMessage.toDouble()
+        val timeDiff = kotlin.math.abs(printedTime - (System.currentTimeMillis() / 1000.0))
+        // Assert difference in times less than 10 seconds
+        assertTrue(timeDiff < 10.0)
+    }
 }

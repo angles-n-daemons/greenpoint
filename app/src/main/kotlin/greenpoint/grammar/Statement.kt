@@ -7,11 +7,13 @@ sealed class Stmt {
 
     interface Visitor<R> {
         fun visitExpressionStmt(stmt: Expression): R
+        fun visitFuncStmt(stmt: Func): R
         fun visitPrintStmt(stmt: Print): R
         fun visitVarStmt(stmt: Var): R
         fun visitBlockStmt(stmt: Block): R
         fun visitIfStmt(stmt: If): R
         fun visitWhileStmt(stmt: While): R
+        fun visitReturnStmt(stmt: Return): R
     }
 
     data class Expression(
@@ -22,11 +24,30 @@ sealed class Stmt {
         }
     }
 
+    data class Func(
+        val name: Token,
+        val params: List<Token>,
+        val body: Stmt,
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitFuncStmt(this)
+        }
+    }
+
     data class Print(
         val expr: Expr,
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitPrintStmt(this)
+        }
+    }
+
+    data class Return(
+        val keyword: Token,
+        val value: Expr?,
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitReturnStmt(this)
         }
     }
 

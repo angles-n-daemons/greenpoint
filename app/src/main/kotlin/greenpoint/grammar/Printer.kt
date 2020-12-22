@@ -9,6 +9,14 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
         return stmt.expr.accept(this)
     }
 
+    override fun visitFuncStmt(stmt: Stmt.Func): String {
+        return "dont do funcs"
+    }
+
+    override fun visitReturnStmt(stmt: Stmt.Return): String {
+        return "dont do funcs"
+    }
+
     override fun visitPrintStmt(stmt: Stmt.Print): String {
         return stmt.expr.accept(this)
     }
