@@ -149,6 +149,10 @@ class Interpreter(
         }
     }
 
+    override fun visitCallExpr(expr: Expr.Call): Any? {
+        throw RuntimeError("Sumting wong")
+    }
+
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {
         return expr.value
     }

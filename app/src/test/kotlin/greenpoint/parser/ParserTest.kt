@@ -199,4 +199,34 @@ class ParserTest {
             stmts,
         )
     }
+
+    @Test fun testCall() {
+        val parser = Parser(Scanner("""
+            a(b, c());
+        """).scanTokens())
+        val stmts = parser.parse()
+        val expected = mutableListOf<Stmt>(
+            Stmt.Expression(
+                Expr.Call(
+                    Expr.Variable(Token(TokenType.IDENTIFIER, "a", null, 2)),
+                    Token(TokenType.RIGHT_PAREN, ")", null, 2),
+                    mutableListOf<Expr>(
+                        Expr.Variable(Token(TokenType.IDENTIFIER, "b", null, 2)),
+                        Expr.Call(
+                            Expr.Variable(Token(TokenType.IDENTIFIER, "c", null, 2)),
+                            Token(TokenType.RIGHT_PAREN, ")", null, 2),
+                            mutableListOf<Expr>(),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        if (parser.hasErrors()) {
+            parser.printErrors()
+        }
+        assertEquals(
+            expected,
+            stmts,
+        )
+    }
 }

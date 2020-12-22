@@ -268,7 +268,41 @@ class Parser(val tokens: List<Token>){
             return Expr.Unary(op, right)
         }
 
-        return primary()
+        return call()
+    }
+
+    private fun call(): Expr {
+        var expr = primary()
+
+        while (true) {
+            if (match(TokenType.LEFT_PAREN)) {
+                expr = finishCall(expr)
+            }
+            else {
+                break
+            }
+        }
+
+        return expr
+    }
+
+    private fun finishCall(callee: Expr): Expr {
+        var args = mutableListOf<Expr>()
+        if (!check(TokenType.RIGHT_PAREN)) {
+            val nextExpr = expression()
+            if (nextExpr is Expr.ExprList) {
+                args = nextExpr.expressions
+            } else {
+                args.add(nextExpr)
+            }
+        }
+
+        if (args.size > 255) {
+            throw ParseError("Too many arguments, maximum allowed is 255")
+        }
+
+        val paren = consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments")
+        return Expr.Call(callee, paren, args)
     }
 
     private fun primary(): Expr {
