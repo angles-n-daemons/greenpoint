@@ -397,6 +397,34 @@ class InterpreterTest {
         )
     }
 
+    @Test fun testFunctionClosures() {
+        var printedMessages = mutableListOf<Any?>()
+        fun fakePrint(message: Any?): Unit {
+            printedMessages.add(message)
+        }
+
+        Interpreter(::fakePrint).run("""
+            fun makeCounter() {
+                var i = 0;
+                fun count() {
+                    i = i + 1;
+                    print i;
+                }
+
+                return count;
+            }
+
+            var counter = makeCounter();
+            counter(); // 1
+            counter(); // 2
+        """)
+
+        assertEquals(
+            mutableListOf<Any?>("1.0", "2.0"),
+            printedMessages,
+        )
+    }
+
     @Test fun testClock() {
         var printedMessage: String = ""
         fun fakePrint(message: Any?): Unit {

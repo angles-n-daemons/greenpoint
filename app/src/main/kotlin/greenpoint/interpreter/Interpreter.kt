@@ -73,7 +73,8 @@ class Interpreter(
     }
 
     override fun visitFuncStmt(stmt: Stmt.Func): Any? {
-        environment.define(stmt.name, Func(stmt))
+        val f = Func(stmt, environment)
+        environment.define(stmt.name, f)
         return null
     }
 

@@ -15,13 +15,16 @@ interface Callable {
 }
 
 
-class Func(val func: Stmt.Func): Callable {
+class Func(
+    val func: Stmt.Func,
+    val closure: Environment,
+): Callable {
     override fun arity(): Int {
         return func.params.size
     }
 
     override fun call(interpreter: Interpreter, args: List<Any?>): Any? {
-        val environment = Environment(interpreter.globals)
+        val environment = Environment(closure)
 
         for (i in 0..(func.params.size-1)) {
             environment.define(func.params.get(i), args.get(i))
