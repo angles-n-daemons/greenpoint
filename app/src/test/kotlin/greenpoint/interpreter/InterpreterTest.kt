@@ -353,6 +353,30 @@ class InterpreterTest {
         assertTrue(errored)
     }
 
+    @Test fun testInterpreterFunctionAsReference() {
+        var printedMessage:Any? = null
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            fun a(f) {
+                f();
+            }
+
+            fun b() {
+                print "hello world";
+            }
+
+            a(b);
+        """)
+
+        assertEquals(
+            "hello world",
+            printedMessage,
+        )
+    }
+
     @Test fun testFunctionEnvironments() {
         var printedMessages = mutableListOf<Any?>()
         fun fakePrint(message: Any?): Unit {
