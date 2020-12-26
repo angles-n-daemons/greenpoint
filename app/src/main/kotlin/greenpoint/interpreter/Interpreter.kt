@@ -203,6 +203,15 @@ class Interpreter(
         }
     }
 
+    override fun visitFuncExpr(expr: Expr.Func): Any? {
+        // Wrap function for usage later
+        return Func(Stmt.Func(
+            Token(TokenType.IDENTIFIER, "anon func", null, -1),
+            expr.params,
+            expr.body,
+        ), environment)
+    }
+
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {
         return expr.value
     }

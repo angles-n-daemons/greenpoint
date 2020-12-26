@@ -425,6 +425,30 @@ class InterpreterTest {
         )
     }
 
+    @Test fun testAnonymousFunction() {
+        var printedMessages = mutableListOf<Any?>()
+        fun fakePrint(message: Any?): Unit {
+            printedMessages.add(message)
+        }
+
+        Interpreter(::fakePrint).run("""
+            fun thrice(fn) {
+                for (var i = 1; i <= 3; i = i + 1) {
+                    fn(i);
+                }
+            }
+
+            thrice(fun (a) {
+                print(a);
+            });
+        """)
+
+        assertEquals(
+            mutableListOf<Any?>("1.0", "2.0", "3.0"),
+            printedMessages,
+        )
+    }
+
     @Test fun testClock() {
         var printedMessage: String = ""
         fun fakePrint(message: Any?): Unit {

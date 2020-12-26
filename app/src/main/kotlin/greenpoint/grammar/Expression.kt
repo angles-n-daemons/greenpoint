@@ -16,6 +16,7 @@ sealed class Expr {
         fun visitAssignExpr(expr: Assign): R
         fun visitLogicalExpr(expr: Logical): R
         fun visitCallExpr(expr: Call): R
+        fun visitFuncExpr(expr: Func): R
     }
 
     data class Binary( 
@@ -97,6 +98,15 @@ sealed class Expr {
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitCallExpr(this)
+        }
+    }
+
+    data class Func(
+        val params: List<Token>,
+        val body: Stmt,
+    ): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitFuncExpr(this)
         }
     }
 }

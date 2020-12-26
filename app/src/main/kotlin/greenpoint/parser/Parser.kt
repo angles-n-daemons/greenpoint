@@ -164,22 +164,28 @@ class Parser(val tokens: List<Token>){
 
     private fun function(kind: String): Stmt {
         val name = consume(TokenType.IDENTIFIER, "Expect $kind name")
+        val params = parameters("$kind ${name.lexeme}")
+
+        // Read function body
+        consume(TokenType.LEFT_BRACE, "Expect '{' to follow $kind definition for ${name.lexeme}")
+        return Stmt.Func(name, params, block())
+    }
+
+    private fun parameters(kind: String): List<Token> {
         consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name")
         val params = mutableListOf<Token>();
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (params.size >= 255) {
-                    throw ParseError("Can't have more than 255 parameters for $kind ${name.lexeme}")
+                    throw ParseError("Can't have more than 255 parameters for $kind")
                 }
                 params.add(consume(TokenType.IDENTIFIER, "Expect parameter name"))
 
             } while(match(TokenType.COMMA))
         }
-        consume(TokenType.RIGHT_PAREN, "Expect closing ')' after $kind ${name.lexeme} parameters")
+        consume(TokenType.RIGHT_PAREN, "Expect closing ')' after $kind parameters")
 
-        // Read function body
-        consume(TokenType.LEFT_BRACE, "Expect '{' to follow $kind definition for ${name.lexeme}")
-        return Stmt.Func(name, params, block())
+        return params
     }
 
     private fun expression(): Expr {
@@ -187,13 +193,23 @@ class Parser(val tokens: List<Token>){
     }
 
     private fun comma(): Expr {
-        var expressions = mutableListOf<Expr>(assignment())
+        var expressions = mutableListOf<Expr>(anonymousFunction())
 
         while (match(TokenType.COMMA)) {
-            expressions.add(assignment())
+            expressions.add(anonymousFunction())
         }
 
         return if (expressions.size == 1) expressions.first() else Expr.ExprList(expressions)
+    }
+
+    private fun anonymousFunction(): Expr {
+        if (match(TokenType.FUN)) {
+            val params = parameters("anonymous function")
+            consume(TokenType.LEFT_BRACE, "Expect '{' to follow definition for anonymous function")
+            return Expr.Func(params, block())
+        } else {
+            return assignment()
+        }
     }
 
     private fun assignment(): Expr {

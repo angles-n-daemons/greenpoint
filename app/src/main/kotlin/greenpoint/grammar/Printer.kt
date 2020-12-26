@@ -13,6 +13,10 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
         return "dont do funcs"
     }
 
+    override fun visitFuncExpr(stmt: Expr.Func): String {
+        return "dont do funcs"
+    }
+
     override fun visitReturnStmt(stmt: Stmt.Return): String {
         return "dont do funcs"
     }
