@@ -27,7 +27,7 @@ sealed class Stmt {
     data class Func(
         val name: Token,
         val params: List<Token>,
-        val body: Stmt,
+        val body: List<Stmt>,
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitFuncStmt(this)

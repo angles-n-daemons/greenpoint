@@ -238,9 +238,9 @@ class ParserTest {
                 Token(TokenType.IDENTIFIER, "a", null, 2),
                 Token(TokenType.IDENTIFIER, "b", null, 2),
             ),
-            Stmt.Block(mutableListOf<Stmt>(
+            mutableListOf<Stmt>(
                 Stmt.Print(Expr.Literal("hello world")),
-            )),
+            ),
         ))
         assertEquals(
             expected,

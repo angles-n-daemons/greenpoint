@@ -103,7 +103,7 @@ sealed class Expr {
 
     data class Func(
         val params: List<Token>,
-        val body: Stmt,
+        val body: List<Stmt>,
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitFuncExpr(this)

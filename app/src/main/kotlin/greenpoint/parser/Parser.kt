@@ -54,7 +54,7 @@ class Parser(val tokens: List<Token>){
         if (match(TokenType.PRINT)) return printStmt()
         if (match(TokenType.RETURN)) return returnStmt()
         if (match(TokenType.WHILE)) return whileStmt()
-        if (match(TokenType.LEFT_BRACE)) return block()
+        if (match(TokenType.LEFT_BRACE)) return Stmt.Block(block())
         return expressionStmt()
     }
 
@@ -134,14 +134,14 @@ class Parser(val tokens: List<Token>){
         return Stmt.Return(keyword, value)
     }
 
-    private fun block(): Stmt {
+    private fun block(): List<Stmt> {
         val statements = mutableListOf<Stmt>()
         while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
             statements.add(declaration())
         }
 
         consume(TokenType.RIGHT_BRACE, "Expected '}' to close block")
-        return Stmt.Block(statements)
+        return statements
     }
 
     private fun expressionStmt(): Stmt {

@@ -116,23 +116,19 @@ class Interpreter(
     }
 
     override fun visitBlockStmt(stmt: Stmt.Block): Any? {
-        executeBlock(stmt, Environment(environment))
+        executeBlock(stmt.statements, Environment(environment))
         return null
     }
 
     fun executeBlock(
-        block: Stmt,
+        statements: List<Stmt>,
         environment: Environment,
     ) {
-        if (!(block is Stmt.Block)) {
-            throw RuntimeError("Unexpected: statement is not a block")
-        }
-
         val previous = this.environment
         try {
             this.environment = environment
             
-            for (statement in block.statements) {
+            for (statement in statements) {
                 execute(statement)
             }
         } finally {
