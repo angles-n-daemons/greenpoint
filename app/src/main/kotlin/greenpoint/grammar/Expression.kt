@@ -66,12 +66,14 @@ sealed class Expr {
         }
     }
 
-    data class Variable(val name: Token): Expr() {
+    // INTENTIONALLY NOT DATA CLASS SO CAN BE MAP KEY
+    class Variable(val name: Token): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitVariableExpr(this)
         }
     }
 
+    // INTENTIONALLY NOT DATA CLASS SO CAN BE MAP KEY
     data class Assign(
         val name: Token,
         val value: Expr,

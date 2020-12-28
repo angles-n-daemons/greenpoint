@@ -14,6 +14,8 @@ import greenpoint.interpreter.function.Func
 import greenpoint.interpreter.function.Return
 import greenpoint.interpreter.function.seedEnvironmentWithNatives
 
+import greenpoint.resolver.Resolver
+
 
 class RuntimeError(message: String): RuntimeException(message)
 
@@ -23,6 +25,7 @@ class Interpreter(
 ): Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     val globals = Environment()
     private var environment = globals
+    private var locals = mutableMapOf<Expr, Int>()
 
     init {
         seedEnvironmentWithNatives(globals)
@@ -43,6 +46,9 @@ class Interpreter(
             return null
         }
 
+        val resolver = Resolver(this)
+        resolver.resolve(statements)
+
         var result: Any? = null
         for (statement in statements) {
             result = execute(statement)
@@ -62,6 +68,10 @@ class Interpreter(
         val tokens = scanner.scanTokens()
         val parser = Parser(tokens)
         return execute(parser.parseStatement())
+    }
+
+    fun resolve(expr: Expr, dist: Int) {
+        locals.put(expr, dist)
     }
 
     private fun execute(stmt: Stmt): Any? {
@@ -235,13 +245,27 @@ class Interpreter(
     }
     
     override fun visitVariableExpr(expr: Expr.Variable): Any? {
-        return environment.get(expr.name)
+        return lookupVariable(expr.name, expr)
     }
     
     override fun visitAssignExpr(expr: Expr.Assign): Any? {
         val value = evaluate(expr.value)
-        environment.assign(expr.name, value)
+        val dist = locals.get(expr)
+        if (dist != null) {
+            environment.assignAt(dist, expr.name, value)
+        } else {
+            globals.assign(expr.name, value)
+        }
         return value
+    }
+
+    private fun lookupVariable(name: Token, expr: Expr): Any? {
+        val dist = locals.get(expr)
+        if (dist != null) {
+            return environment.getAt(dist, name)
+        } else {
+            return globals.get(name)
+        }
     }
 
     private fun evaluate(expr: Expr): Any? {
