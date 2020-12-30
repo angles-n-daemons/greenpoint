@@ -11,10 +11,18 @@ import greenpoint.grammar.Stmt
 class ResolverError(message: String): RuntimeException(message)
 
 
+enum class FunctionType {
+        NONE,
+        FUNCTION,
+        ANONYMOUS,
+}
+
+
 class Resolver (
     val interpreter: Interpreter,
 ): Stmt.Visitor<Unit>, Expr.Visitor<Unit> {
     val scopes = ArrayDeque<MutableMap<String, Boolean>>()
+    private val currentFunction = FunctionType.NONE
 
     fun resolve(statements: List<Stmt>) {
         for (statement in statements) {
@@ -62,15 +70,26 @@ class Resolver (
         }
     }
 
-    private fun resolveFunction(params: List<Token>, body: List<Stmt>) {
-        beginScope()
-        for (param in params) {
-            declare(param)
-            define(param)
-        }
+    private fun resolveFunction(
+        params: List<Token>,
+        body: List<Stmt>,
+        type: FunctionType,
+    ) {
+        val enclosingFunction = currentFunction
+        currentFunction = type
+        try {
+            beginScope()
 
-        resolve(body)
-        endScope()
+            for (param in params) {
+                declare(param)
+                define(param)
+            }
+
+            resolve(body)
+            endScope()
+        } finally {
+            currentFunction = enclosingFunction
+        }
     }
 
     override fun visitBlockStmt(stmt: Stmt.Block) {
@@ -106,7 +125,7 @@ class Resolver (
     override fun visitFuncStmt(stmt: Stmt.Func) {
         declare(stmt.name)
         define(stmt.name)
-        resolveFunction(stmt.params, stmt.body)
+        resolveFunction(stmt.params, stmt.body, FunctionType.FUNCTION)
     }
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
@@ -124,6 +143,9 @@ class Resolver (
     }
 
     override fun visitReturnStmt(stmt: Stmt.Return) {
+        if (currentFunction == FunctionType.NONE) {
+            throw ResolverError("Can't return from top-level code")
+        }
         if (stmt.value != null) {
             resolve(stmt.value)
         }
@@ -175,6 +197,6 @@ class Resolver (
     }
 
     override fun visitFuncExpr(expr: Expr.Func) {
-        resolveFunction(expr.params, expr.body)
+        resolveFunction(expr.params, expr.body, FunctionType.ANONYMOUS)
     }
 }
