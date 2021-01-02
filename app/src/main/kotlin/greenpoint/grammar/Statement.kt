@@ -14,6 +14,7 @@ sealed class Stmt {
         fun visitIfStmt(stmt: If): R
         fun visitWhileStmt(stmt: While): R
         fun visitReturnStmt(stmt: Return): R
+        fun visitClassStmt(stmt: Class): R
     }
 
     data class Expression(
@@ -82,6 +83,15 @@ sealed class Stmt {
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitWhileStmt(this)
+        }
+    }
+
+    data class Class (
+        val name: Token,
+        val methods: List<Stmt.Func>,
+    ): Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitClassStmt(this)
         }
     }
 }

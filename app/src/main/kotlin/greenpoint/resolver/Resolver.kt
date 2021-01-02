@@ -22,7 +22,7 @@ class Resolver (
     val interpreter: Interpreter,
 ): Stmt.Visitor<Unit>, Expr.Visitor<Unit> {
     val scopes = ArrayDeque<MutableMap<String, Boolean>>()
-    private val currentFunction = FunctionType.NONE
+    private var currentFunction = FunctionType.NONE
 
     fun resolve(statements: List<Stmt>) {
         for (statement in statements) {
@@ -120,6 +120,11 @@ class Resolver (
     override fun visitAssignExpr(expr: Expr.Assign) {
         resolve(expr.value)
         resolveLocal(expr, expr.name)
+    }
+
+    override fun visitClassStmt(stmt: Stmt.Class) {
+        declare(stmt.name)
+        define(stmt.name)
     }
 
     override fun visitFuncStmt(stmt: Stmt.Func) {

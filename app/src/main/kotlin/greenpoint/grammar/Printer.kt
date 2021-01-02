@@ -52,6 +52,10 @@ class ASTPrinter: Expr.Visitor<String>, Stmt.Visitor<String> {
         return "dont do call"
     }
 
+    override fun visitClassStmt(stmt: Stmt.Class): String {
+        return "dont do class"
+    }
+
     override fun visitBinaryExpr(expr: Expr.Binary): String {
         return parenthesize(
             expr.op.lexeme,

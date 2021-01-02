@@ -9,6 +9,7 @@ import greenpoint.parser.Parser
 import greenpoint.grammar.Expr
 import greenpoint.grammar.Stmt
 
+import greenpoint.interpreter.classes.Class
 import greenpoint.interpreter.function.Callable
 import greenpoint.interpreter.function.Func
 import greenpoint.interpreter.function.Return
@@ -80,6 +81,13 @@ class Interpreter(
 
     override fun visitExpressionStmt(stmt: Stmt.Expression): Any? {
         return evaluate(stmt.expr)
+    }
+
+    override fun visitClassStmt(stmt: Stmt.Class): Any? {
+        environment.define(stmt.name, null)
+        val klass = Class(stmt.name.lexeme)
+        environment.assign(stmt.name, klass)
+        return null
     }
 
     override fun visitFuncStmt(stmt: Stmt.Func): Any? {

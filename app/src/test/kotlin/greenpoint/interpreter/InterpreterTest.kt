@@ -467,4 +467,21 @@ class InterpreterTest {
         // Assert difference in times less than 10 seconds
         assertTrue(timeDiff < 10.0)
     }
+
+    @Test fun testClass() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            class CoffeeCupExtreme{}
+            print CoffeeCupExtreme;
+        """)
+
+        assertEquals(
+            "CoffeeCupExtreme",
+            printedMessage,
+        )
+    }
 }
