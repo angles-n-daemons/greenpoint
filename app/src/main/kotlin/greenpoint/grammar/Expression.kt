@@ -17,6 +17,8 @@ sealed class Expr {
         fun visitLogicalExpr(expr: Logical): R
         fun visitCallExpr(expr: Call): R
         fun visitFuncExpr(expr: Func): R
+        fun visitGetExpr(expr: Get): R
+        fun visitSetExpr(expr: Set): R
     }
 
     data class Binary( 
@@ -109,6 +111,25 @@ sealed class Expr {
     ): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitFuncExpr(this)
+        }
+    }
+
+    data class Get(
+        val obj: Expr,
+        val name: Token,
+    ): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitGetExpr(this)
+        }
+    }
+
+    data class Set(
+        val obj: Expr,
+        val name: Token,
+        val value: Expr,
+    ): Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitSetExpr(this)
         }
     }
 }

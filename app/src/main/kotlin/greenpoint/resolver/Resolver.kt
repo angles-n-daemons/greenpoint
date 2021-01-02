@@ -204,4 +204,13 @@ class Resolver (
     override fun visitFuncExpr(expr: Expr.Func) {
         resolveFunction(expr.params, expr.body, FunctionType.ANONYMOUS)
     }
+
+    override fun visitGetExpr(expr: Expr.Get) {
+        resolve(expr.obj)
+    }
+
+    override fun visitSetExpr(expr: Expr.Set) {
+        resolve(expr.value)
+        resolve(expr.obj)
+    }
 }

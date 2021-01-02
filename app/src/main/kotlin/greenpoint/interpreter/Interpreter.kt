@@ -10,6 +10,7 @@ import greenpoint.grammar.Expr
 import greenpoint.grammar.Stmt
 
 import greenpoint.interpreter.classes.Class
+import greenpoint.interpreter.classes.Instance
 import greenpoint.interpreter.function.Callable
 import greenpoint.interpreter.function.Func
 import greenpoint.interpreter.function.Return
@@ -224,6 +225,23 @@ class Interpreter(
             expr.params,
             expr.body,
         ), environment)
+    }
+
+    override fun visitGetExpr(expr: Expr.Get): Any? {
+        val obj = evaluate(expr.obj)
+        if (obj is Instance) {
+            return obj.get(expr.name)
+        }
+        throw RuntimeError("Only instances have properties")
+    }
+
+    override fun visitSetExpr(expr: Expr.Set): Any? {
+        val obj = evaluate(expr.obj)
+        if (obj is Instance) {
+            val value = evaluate(expr.value)
+            return obj.set(expr.name, value)
+        }
+        throw RuntimeError("Only instances have fields")
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {

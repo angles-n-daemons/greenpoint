@@ -484,4 +484,21 @@ class InterpreterTest {
             printedMessage,
         )
     }
+
+    @Test fun testClassInstance() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            class CoffeeCupExtreme{}
+            print CoffeeCupExtreme();
+        """)
+
+        assertEquals(
+            "CoffeeCupExtreme instance",
+            printedMessage,
+        )
+    }
 }

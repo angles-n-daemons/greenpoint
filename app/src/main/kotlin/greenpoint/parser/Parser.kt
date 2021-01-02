@@ -234,6 +234,8 @@ class Parser(val tokens: List<Token>){
             if (expr is Expr.Variable) {
                 val name = expr.name
                 return Expr.Assign(name, value)
+            } else if (expr is Expr.Get) {
+                return Expr.Set(expr.obj, expr.name, value)
             }
 
             throw ParseError("Invalid assignment target ${expr.javaClass.kotlin.qualifiedName}")
@@ -339,8 +341,10 @@ class Parser(val tokens: List<Token>){
         while (true) {
             if (match(TokenType.LEFT_PAREN)) {
                 expr = finishCall(expr)
-            }
-            else {
+            } else if (match(TokenType.DOT)) {
+                val name = consume(TokenType.IDENTIFIER, "Expect property name after '.'")
+                expr = Expr.Get(expr, name)
+            } else {
                 break
             }
         }
