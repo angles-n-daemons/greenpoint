@@ -22,7 +22,7 @@ class Resolver (
     val interpreter: Interpreter,
 ): Stmt.Visitor<Unit>, Expr.Visitor<Unit> {
     val scopes = ArrayDeque<MutableMap<String, Boolean>>()
-    private val currentFunction = FunctionType.NONE
+    private var currentFunction = FunctionType.NONE
 
     fun resolve(statements: List<Stmt>) {
         for (statement in statements) {
