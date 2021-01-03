@@ -19,11 +19,18 @@ enum class FunctionType {
 }
 
 
+enum class ClassType {
+    NONE,
+    CLASS,
+}
+
+
 class Resolver (
     val interpreter: Interpreter,
 ): Stmt.Visitor<Unit>, Expr.Visitor<Unit> {
     val scopes = ArrayDeque<MutableMap<String, Boolean>>()
     private var currentFunction = FunctionType.NONE
+    private var currentClass = ClassType.NONE
 
     fun resolve(statements: List<Stmt>) {
         for (statement in statements) {
@@ -124,6 +131,9 @@ class Resolver (
     }
 
     override fun visitClassStmt(stmt: Stmt.Class) {
+        enclosingClass = currentClass
+        currentClass = ClassType.CLASS
+
         declare(stmt.name)
         define(stmt.name)
 
@@ -136,6 +146,8 @@ class Resolver (
         }
         
         endScope()
+
+        currentClass = enclosingClass
     }
 
     override fun visitFuncStmt(stmt: Stmt.Func) {
@@ -226,6 +238,9 @@ class Resolver (
     }
 
     override fun visitThisExpr(expr: Expr.This) {
+        if (currentClass = ClassType.NONE) {
+                throw ResolverError("Can't use 'this' outside of a class.")
+        }
         resolveLocal(expr, expr.keyword)
     }
 }
