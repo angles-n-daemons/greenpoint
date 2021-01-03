@@ -501,4 +501,49 @@ class InterpreterTest {
             printedMessage,
         )
     }
+
+    @Test fun testClassFuncField() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            var x = 5;
+            fun derp() {
+                print x;
+            }
+            class CoffeeCupExtreme{}
+            var coffee = CoffeeCupExtreme();
+            coffee.derp = derp;
+            coffee.derp();
+        """)
+
+        assertEquals(
+            "5.0",
+            printedMessage,
+        )
+    }
+
+    @Test fun testClassMethod() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            class Bacon {
+                eat() {
+                    print "crunch crunch";
+                }
+            }
+
+            Bacon().eat();
+        """)
+
+        assertEquals(
+            "crunch crunch",
+            printedMessage,
+        )
+    }
 }

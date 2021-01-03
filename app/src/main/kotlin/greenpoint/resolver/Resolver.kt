@@ -12,9 +12,10 @@ class ResolverError(message: String): RuntimeException(message)
 
 
 enum class FunctionType {
-        NONE,
-        FUNCTION,
-        ANONYMOUS,
+    NONE,
+    FUNCTION,
+    METHOD,
+    ANONYMOUS,
 }
 
 
@@ -125,6 +126,11 @@ class Resolver (
     override fun visitClassStmt(stmt: Stmt.Class) {
         declare(stmt.name)
         define(stmt.name)
+
+        for (method in stmt.methods) {
+            val declaration = FunctionType.METHOD
+            resolveFunction(method.params, method.body, declaration)
+        }
     }
 
     override fun visitFuncStmt(stmt: Stmt.Func) {

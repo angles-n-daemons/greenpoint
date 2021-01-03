@@ -86,8 +86,19 @@ class Interpreter(
 
     override fun visitClassStmt(stmt: Stmt.Class): Any? {
         environment.define(stmt.name, null)
-        val klass = Class(stmt.name.lexeme)
-        environment.assign(stmt.name, klass)
+
+        val methods = mutableMapOf<String, Func>()
+        for (method in stmt.methods) {
+            methods.put(
+                method.name.lexeme,
+                Func(method, environment),
+            )
+        }
+
+        environment.assign(
+            stmt.name,
+            Class(stmt.name.lexeme, methods),
+        )
         return null
     }
 
