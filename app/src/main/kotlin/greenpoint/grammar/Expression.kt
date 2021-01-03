@@ -21,7 +21,7 @@ sealed class Expr {
         fun visitSetExpr(expr: Set): R
     }
 
-    class Binary( 
+    class Binary(
         val left: Expr,
         val op: Token,
         val right: Expr,
