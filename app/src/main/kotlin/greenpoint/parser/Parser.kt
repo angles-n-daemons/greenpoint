@@ -375,6 +375,7 @@ class Parser(val tokens: List<Token>){
         if (match(TokenType.FALSE)) return Expr.Literal(false)
         if (match(TokenType.TRUE)) return Expr.Literal(true)
         if (match(TokenType.NIL)) return Expr.Literal(null)
+        if (match(TokenType.THIS)) return Expr.This(previous())
         if (match(TokenType.IDENTIFIER)) return Expr.Variable(previous())
 
         if (match(TokenType.NUMBER, TokenType.STRING)) {

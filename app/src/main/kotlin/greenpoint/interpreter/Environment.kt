@@ -9,7 +9,7 @@ class Environment(val enclosing: Environment? = null) {
     protected val values: HashMap<String, Any?> = HashMap<String, Any?>()
 
     fun define(name: Token, value: Any?) {
-        if (name.type != TokenType.IDENTIFIER) {
+        if (!validTokenType(name)) {
             throw wrongTokenError(name)
         }
 
@@ -21,7 +21,7 @@ class Environment(val enclosing: Environment? = null) {
     }
 
     fun assign(name: Token, value: Any?) {
-        if (name.type != TokenType.IDENTIFIER) {
+        if (!validTokenType(name)) {
             throw wrongTokenError(name)
         }
 
@@ -39,7 +39,7 @@ class Environment(val enclosing: Environment? = null) {
     }
 
     fun get(name: Token): Any? {
-        if (name.type != TokenType.IDENTIFIER) {
+        if (!validTokenType(name)) {
             throw wrongTokenError(name)
         }
 
@@ -55,7 +55,7 @@ class Environment(val enclosing: Environment? = null) {
     }
 
     fun getAt(dist: Int, name: Token): Any? {
-        if (name.type != TokenType.IDENTIFIER) {
+        if (!validTokenType(name)) {
             throw wrongTokenError(name)
         }
 
@@ -72,7 +72,7 @@ class Environment(val enclosing: Environment? = null) {
     }
 
     fun assignAt(dist: Int, name: Token, value: Any?) {
-        if (name.type != TokenType.IDENTIFIER) {
+        if (!validTokenType(name)) {
             throw wrongTokenError(name)
         }
 
@@ -102,6 +102,13 @@ class Environment(val enclosing: Environment? = null) {
 
     private fun wrongTokenError(name: Token): RuntimeError {
         return RuntimeError("Bad interpreter, attempted to retrieve variable with ${name.type}")
+    }
+
+    private fun validTokenType(name: Token): Boolean {
+        when (name.type) {
+            TokenType.IDENTIFIER, TokenType.THIS -> return true
+            else -> return false
+        }
     }
 
     private fun printEnvironmentStack(depth: Int=0) {

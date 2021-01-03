@@ -2,7 +2,10 @@ package greenpoint.interpreter.function
 
 import greenpoint.grammar.Stmt
 
+import greenpoint.scanner.Token
+import greenpoint.scanner.TokenType
 import greenpoint.interpreter.Interpreter
+import greenpoint.interpreter.classes.Instance
 import greenpoint.interpreter.Environment
 
 
@@ -40,5 +43,11 @@ class Func(
 
     override fun toString(): String {
         return "<fn ${func.name.lexeme}>"
+    }
+
+    fun bind(instance: Instance): Func {
+        val environment = Environment(closure)
+        environment.define(Token(TokenType.THIS, "this", null, 0), instance)
+        return Func(func, environment)
     }
 }

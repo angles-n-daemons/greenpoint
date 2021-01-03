@@ -255,6 +255,10 @@ class Interpreter(
         throw RuntimeError("Only instances have fields")
     }
 
+    override fun visitThisExpr(expr: Expr.This): Any? {
+        return lookupVariable(expr.keyword, expr)
+    }
+
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {
         return expr.value
     }

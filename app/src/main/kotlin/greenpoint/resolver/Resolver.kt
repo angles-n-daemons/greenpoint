@@ -127,10 +127,15 @@ class Resolver (
         declare(stmt.name)
         define(stmt.name)
 
+        beginScope()
+        scopes.peek().put("this", true)
+
         for (method in stmt.methods) {
             val declaration = FunctionType.METHOD
             resolveFunction(method.params, method.body, declaration)
         }
+        
+        endScope()
     }
 
     override fun visitFuncStmt(stmt: Stmt.Func) {
@@ -218,5 +223,9 @@ class Resolver (
     override fun visitSetExpr(expr: Expr.Set) {
         resolve(expr.value)
         resolve(expr.obj)
+    }
+
+    override fun visitThisExpr(expr: Expr.This) {
+        resolveLocal(expr, expr.keyword)
     }
 }

@@ -546,4 +546,79 @@ class InterpreterTest {
             printedMessage,
         )
     }
+
+    @Test fun testClassEgotist() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            class Egotist {
+                speak() {
+                    print this;
+                }
+            }
+
+            var method = Egotist().speak;
+            method();
+        """)
+
+        assertEquals(
+            "Egotist instance",
+            printedMessage,
+        )
+    }
+
+    @Test fun testClassCake() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            class Cake {
+                taste() {
+                    var adjective = "delicious";
+                    print "The " + this.flavor + " cake is " + adjective + "!";
+                }
+            }
+
+            var cake = Cake();
+            cake.flavor = "German chocolate";
+            cake.taste();
+        """)
+
+        assertEquals(
+            "The German chocolate cake is delicious!",
+            printedMessage,
+        )
+    }
+
+    @Test fun testClassCallback() {
+        var printedMessage: Any? = ""
+        fun fakePrint(message: Any?): Unit {
+            printedMessage = message
+        }
+
+        Interpreter(::fakePrint).run("""
+            class Thing {
+                getCallback() {
+                    fun localFunction() {
+                        print this;
+                    }
+
+                    return localFunction;
+                }
+            }
+
+            var callback = Thing().getCallback();
+            callback();
+        """)
+
+        assertEquals(
+            "Thing instance",
+            printedMessage,
+        )
+    }
 }

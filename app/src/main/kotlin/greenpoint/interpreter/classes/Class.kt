@@ -45,7 +45,7 @@ class Instance(
         }
 
         val method = klass.findMethod(name.lexeme)
-        if (method != null) return method
+        if (method != null) return method.bind(this)
 
         throw RuntimeError("Undefined property ${name.lexeme}.")
     }
