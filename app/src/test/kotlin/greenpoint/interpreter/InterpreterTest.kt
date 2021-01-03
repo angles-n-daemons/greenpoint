@@ -621,4 +621,37 @@ class InterpreterTest {
             printedMessage,
         )
     }
+
+    @Test fun testClassConstructorArgs() {
+        val printedMessages = mutableListOf<Any?>()
+        fun fakePrint(message: Any?): Unit {
+            printedMessages.add(message)
+        }
+
+        Interpreter(::fakePrint).run("""
+            class GuyWithFields {
+                init(arg, arg2) {
+                    this.arg = arg;
+                    this.arg2 = arg2;
+                }
+
+                sayFields() {
+                    print this.arg + " " + this.arg2;
+                }
+            }
+
+            var guy = GuyWithFields("hello", 5.0);
+            guy.sayFields();
+            guy.arg2 = "世界";
+            guy.sayFields();
+        """)
+
+        assertEquals(
+            mutableListOf<Any?>(
+                "hello 5.0",
+                "hello 世界",
+            ),
+            printedMessages,
+        )
+    }
 }

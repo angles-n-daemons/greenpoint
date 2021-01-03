@@ -11,6 +11,11 @@ class Class(
     val methods: MutableMap<String, Func>,
 ): Callable {
     override fun arity(): Int {
+        val initializer = findMethod("init")
+
+        if (initializer != null) {
+            return initializer.arity()
+        }
         return 0
     }
 
@@ -18,7 +23,12 @@ class Class(
         interpreter: Interpreter,
         args: List<Any?>,
     ): Any? {
-        return Instance(this)
+        val instance = Instance(this)
+        val initializer = findMethod("init")
+        if (initializer != null) {
+            initializer.bind(instance).call(interpreter, args)
+        }
+        return instance
     }
 
     fun findMethod(name: String): Func? {

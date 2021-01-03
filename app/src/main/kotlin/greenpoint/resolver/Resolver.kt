@@ -15,6 +15,7 @@ enum class FunctionType {
     NONE,
     FUNCTION,
     METHOD,
+    INITIALIZER,
     ANONYMOUS,
 }
 
@@ -131,7 +132,7 @@ class Resolver (
     }
 
     override fun visitClassStmt(stmt: Stmt.Class) {
-        enclosingClass = currentClass
+        val enclosingClass = currentClass
         currentClass = ClassType.CLASS
 
         declare(stmt.name)
@@ -141,7 +142,10 @@ class Resolver (
         scopes.peek().put("this", true)
 
         for (method in stmt.methods) {
-            val declaration = FunctionType.METHOD
+            var declaration = FunctionType.METHOD
+            if (method.name.lexeme == "init") {
+                declaration = FunctionType.INITIALIZER
+            }
             resolveFunction(method.params, method.body, declaration)
         }
         
@@ -175,6 +179,9 @@ class Resolver (
             throw ResolverError("Can't return from top-level code")
         }
         if (stmt.value != null) {
+            if (currentFunction == FunctionType.INITIALIZER) {
+                throw ResolverError("Can't return a value from an initializer")
+            }
             resolve(stmt.value)
         }
     }
@@ -238,7 +245,7 @@ class Resolver (
     }
 
     override fun visitThisExpr(expr: Expr.This) {
-        if (currentClass = ClassType.NONE) {
+        if (currentClass == ClassType.NONE) {
                 throw ResolverError("Can't use 'this' outside of a class.")
         }
         resolveLocal(expr, expr.keyword)

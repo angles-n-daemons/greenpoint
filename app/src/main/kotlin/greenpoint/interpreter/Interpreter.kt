@@ -89,9 +89,10 @@ class Interpreter(
 
         val methods = mutableMapOf<String, Func>()
         for (method in stmt.methods) {
+            val methodName = method.name.lexeme
             methods.put(
-                method.name.lexeme,
-                Func(method, environment),
+                methodName,
+                Func(method, environment, methodName == "init"),
             )
         }
 
@@ -103,7 +104,7 @@ class Interpreter(
     }
 
     override fun visitFuncStmt(stmt: Stmt.Func): Any? {
-        val f = Func(stmt, environment)
+        val f = Func(stmt, environment, false)
         environment.define(stmt.name, f)
         return null
     }
@@ -235,7 +236,7 @@ class Interpreter(
             Token(TokenType.IDENTIFIER, "anon func", null, -1),
             expr.params,
             expr.body,
-        ), environment)
+        ), environment, false)
     }
 
     override fun visitGetExpr(expr: Expr.Get): Any? {
