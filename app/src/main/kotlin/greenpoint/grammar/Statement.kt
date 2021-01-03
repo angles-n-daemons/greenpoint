@@ -17,7 +17,7 @@ sealed class Stmt {
         fun visitClassStmt(stmt: Class): R
     }
 
-    data class Expression(
+    class Expression(
         val expr: Expr,
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
@@ -25,7 +25,7 @@ sealed class Stmt {
         }
     }
 
-    data class Func(
+    class Func(
         val name: Token,
         val params: List<Token>,
         val body: List<Stmt>,
@@ -35,7 +35,7 @@ sealed class Stmt {
         }
     }
 
-    data class Print(
+    class Print(
         val expr: Expr,
     ): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
@@ -43,7 +43,7 @@ sealed class Stmt {
         }
     }
 
-    data class Return(
+    class Return(
         val keyword: Token,
         val value: Expr?,
     ): Stmt() {
@@ -52,7 +52,7 @@ sealed class Stmt {
         }
     }
 
-    data class Var(
+    class Var(
         val name: Token,
         val initializer: Expr?,
     ): Stmt() {
@@ -61,13 +61,13 @@ sealed class Stmt {
         }
     }
 
-    data class Block(val statements: List<Stmt>): Stmt() {
+    class Block(val statements: List<Stmt>): Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitBlockStmt(this)
         }
     }
 
-    data class If(
+    class If(
         val condition: Expr,
         val thenStmt: Stmt,
         val elseStmt: Stmt?,
@@ -77,7 +77,7 @@ sealed class Stmt {
         }
     }
 
-    data class While(
+    class While(
         val condition: Expr,
         val body: Stmt,
     ): Stmt() {
@@ -86,7 +86,7 @@ sealed class Stmt {
         }
     }
 
-    data class Class (
+    class Class (
         val name: Token,
         val methods: List<Stmt.Func>,
     ): Stmt() {

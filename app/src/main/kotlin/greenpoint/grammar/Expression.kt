@@ -21,7 +21,7 @@ sealed class Expr {
         fun visitSetExpr(expr: Set): R
     }
 
-    data class Binary( 
+    class Binary( 
         val left: Expr,
         val op: Token,
         val right: Expr,
@@ -31,7 +31,7 @@ sealed class Expr {
         }
     }
 
-    data class Unary(
+    class Unary(
         val op: Token,
         val expr: Expr,
     ): Expr() {
@@ -40,19 +40,19 @@ sealed class Expr {
         }
     }
 
-    data class Group(val expr: Expr): Expr() {
+    class Group(val expr: Expr): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitGroupExpr(this)
         }
     }
 
-    data class ExprList(val expressions: MutableList<Expr>): Expr() {
+    class ExprList(val expressions: MutableList<Expr>): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitExprListExpr(this)
         }
     }
 
-    data class Ternary(
+    class Ternary(
         val condition: Expr,
         val left: Expr,
         val right: Expr,
@@ -62,7 +62,7 @@ sealed class Expr {
         }
     }
 
-    data class Literal(val value: Any?): Expr() {
+    class Literal(val value: Any?): Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitLiteralExpr(this)
         }
@@ -76,7 +76,7 @@ sealed class Expr {
     }
 
     // INTENTIONALLY NOT DATA CLASS SO CAN BE MAP KEY
-    data class Assign(
+    class Assign(
         val name: Token,
         val value: Expr,
     ): Expr() {
@@ -85,7 +85,7 @@ sealed class Expr {
         }
     }
 
-    data class Logical(
+    class Logical(
         val left: Expr,
         val op: Token,
         val right: Expr,
@@ -95,7 +95,7 @@ sealed class Expr {
         }
     }
 
-    data class Call(
+    class Call(
         val callee: Expr,
         val paren: Token,
         val args: List<Expr>,
@@ -105,7 +105,7 @@ sealed class Expr {
         }
     }
 
-    data class Func(
+    class Func(
         val params: List<Token>,
         val body: List<Stmt>,
     ): Expr() {
@@ -114,7 +114,7 @@ sealed class Expr {
         }
     }
 
-    data class Get(
+    class Get(
         val obj: Expr,
         val name: Token,
     ): Expr() {
@@ -123,7 +123,7 @@ sealed class Expr {
         }
     }
 
-    data class Set(
+    class Set(
         val obj: Expr,
         val name: Token,
         val value: Expr,
